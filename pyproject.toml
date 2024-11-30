@@ -1,0 +1,31 @@
+[project]
+name = "advent-of-code"
+authors = [
+  {name = "Blair Conrad", email = "blair@blairconrad.com"},
+]
+version = "0.1.0"
+description = "Advent of Code"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ruff>=0.8.1",
+]
+
+[tool.ruff]
+exclude = [
+  "misc/date_utils.py",
+  "solutions/base.py",
+  "solutions/utils/example.py",
+]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["ALL"]
+"ignore" = [
+  "COM812",   # may cause conflicts when used with the formatter.
+  "D",        # Docstrings
+  "D203",     # can either force a blank line before docstring or forbid.
+  "D212",     # can either force a blank line before docstring or forbid.
+  "ISC001",   # may cause conflicts when used with the formatter.
+]
