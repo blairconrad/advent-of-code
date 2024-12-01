@@ -2,33 +2,31 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/1
 from collections.abc import Callable, Iterable
-from itertools import starmap
+from itertools import islice, starmap
 
 from pipe import Pipe, select, sort
 
 from ...base import StrSplitSolution, answer
 
+
 def count(target: int, iterable: Iterable[int]) -> int:
     return sum(1 for i in iterable if i == target)
+
 
 @Pipe
 def my_starmap(iterable: Iterable[tuple[int, int]], func: Callable[[tuple[int, int]], int]) -> Iterable[int]:
     return starmap(func, iterable)
 
 
-def first(iterable: tuple[int]) -> int:
-    return iterable[0]
-
-
-def second(iterable: tuple[int]) -> int:
-    return iterable[1]
+def nth(n: int) -> int:
+    return lambda iter: next(islice(iter, n, None), None)
 
 
 def abs_diff(a: int, b: int) -> int:
     return abs(a - b)
 
 
-def parse_int_pair(s: str) -> tuple[int, int]:
+def parse_ints(s: str) -> tuple[int, int]:
     return tuple(map(int, s.split()))
 
 
@@ -38,16 +36,16 @@ class Solution(StrSplitSolution):
 
     @answer(2031679)
     def part_1(self) -> int:
-        location_ids = list(self.input | select(parse_int_pair))
+        location_ids = list(self.input | select(parse_ints))
         self.debug(location_ids)
-        column_1 = location_ids | select(first) | sort
-        column_2 = location_ids | select(second) | sort
-        self.debug(column_1)
-        return zip(column_1, column_2, strict=False) | my_starmap(abs_diff) | Pipe(sum)
+        left_column = location_ids | select(nth(0)) | sort
+        right_column = location_ids | select(nth(1)) | sort
+        self.debug(left_column)
+        return zip(left_column, right_column, strict=False) | my_starmap(abs_diff) | Pipe(sum)
 
     @answer(19678534)
     def part_2(self) -> int:
-        location_ids = list(self.input | select(parse_int_pair))
-        left_column = location_ids | select(first)
-        right_column = list(location_ids | select(second))
+        location_ids = list(self.input | select(parse_ints))
+        left_column = location_ids | select(nth(0))
+        right_column = list(location_ids | select(nth(1)))
         return left_column | select(lambda n: n * count(n, right_column)) | Pipe(sum)
