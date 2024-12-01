@@ -8,6 +8,8 @@ from pipe import Pipe, select, sort
 
 from ...base import StrSplitSolution, answer
 
+def count(target: int, iterable: Iterable[int]) -> int:
+    return sum(1 for i in iterable if i == target)
 
 @Pipe
 def my_starmap(iterable: Iterable[tuple[int, int]], func: Callable[[tuple[int, int]], int]) -> Iterable[int]:
@@ -43,10 +45,9 @@ class Solution(StrSplitSolution):
         self.debug(column_1)
         return zip(column_1, column_2, strict=False) | my_starmap(abs_diff) | Pipe(sum)
 
-    # @answer(1234)
+    @answer(19678534)
     def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        location_ids = list(self.input | select(parse_int_pair))
+        left_column = location_ids | select(first)
+        right_column = list(location_ids | select(second))
+        return left_column | select(lambda n: n * count(n, right_column)) | Pipe(sum)
