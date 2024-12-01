@@ -28,5 +28,7 @@ select = ["ALL"]
   "D",        # Docstrings
   "D203",     # can either force a blank line before docstring or forbid.
   "D212",     # can either force a blank line before docstring or forbid.
+  "INP001",   # File is part of an implicit namespace package. Add an `__init__.py`.
   "ISC001",   # may cause conflicts when used with the formatter.
+  "TID252",   # Prefer absolute imports over relative imports from parent modules
 ]
