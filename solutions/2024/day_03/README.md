@@ -2,9 +2,10 @@
 
 `TITLE` ([prompt](https://adventofcode.com/2024/day/3))
 
-Use this space for notes on the day's solution and to document what you've learned!
 
-## Part 1
+## Things I've learned (or re-learned)
 
-## Part 2
+* the `re` methods do not cause . to match a newline in multiline input without `re.DOTALL`.
+* `pipe` has a `chain` function (I struggled to find it at first).
+* piping to `Pipe(sum)` (for example) shouldn't really work, but for some reason advent prints the single int
 
