@@ -4,30 +4,11 @@
 
 from collections.abc import Iterable
 from dataclasses import dataclass
-from itertools import product
 from typing import Self
 
-from pipe import Pipe, where
+from pipe import Pipe, chain, select, where
 
 from ...base import StrSplitSolution, answer
-
-
-@dataclass
-class Stride:
-    over: int
-    down: int
-
-
-all_strides = [
-    Stride(-1, -1),
-    Stride(0, -1),
-    Stride(1, -1),
-    Stride(-1, 0),
-    Stride(1, 0),
-    Stride(-1, 1),
-    Stride(0, 1),
-    Stride(1, 1),
-]
 
 
 @dataclass
@@ -35,24 +16,34 @@ class Position:
     row: int
     column: int
 
-    def move(self, stride: Stride) -> Self:
-        return Position(self.row + stride.down, self.column + stride.over)
+    def __add__(self, other: Self) -> Self:
+        return Position(self.row + other.row, self.column + other.column)
 
 
-def is_valid_position(puzzle: list[str], position: Position) -> bool:
-    return 0 <= position.row < len(puzzle) and 0 <= position.column < len(puzzle[position.row])
+def positions_in(block: list[str]) -> Iterable[Position]:
+    return (
+        range(len(block))
+        | select(lambda row: range(len(block[row])) | select(lambda column: Position(row, column)))
+        | chain
+    )
 
 
-def find(puzzle: list[str], target: str, starting_position: Position, stride: Stride) -> bool:
-    if not target:
-        return True
+def is_block_present_at(puzzle: list[str], starting_position: Position, block: list[str]) -> bool:
+    return all(
+        positions_in(block)
+        | select(
+            lambda p: (b := block[p.row][p.column]) == " "
+            or (
+                0 <= (puzzle_pos := starting_position + p).row < len(puzzle)
+                and 0 <= puzzle_pos.column < len(puzzle[puzzle_pos.row])
+                and puzzle[puzzle_pos.row][puzzle_pos.column] == b
+            )
+        )
+    )
 
-    if (
-        is_valid_position(puzzle, starting_position)
-        and puzzle[starting_position.row][starting_position.column] == target[0]
-    ):
-        return find(puzzle, target[1:], starting_position.move(stride), stride)
-    return False
+
+def count_block(puzzle: list[str], block: list[str]) -> int:
+    return positions_in(puzzle) | where(lambda p: is_block_present_at(puzzle, p, block)) | how_many
 
 
 @Pipe
@@ -66,11 +57,18 @@ class Solution(StrSplitSolution):
 
     @answer(2397)
     def part_1(self) -> int:
-        return (
-            product(product(range(len(self.input)), range(len(self.input[0]))), all_strides)
-            | where(lambda position_stride: find(self.input, "XMAS", Position(*position_stride[0]), position_stride[1]))
-            | how_many
-        )
+        blocks = [
+            ["XMAS"],
+            ["SAMX"],
+            ["X", "M", "A", "S"],
+            ["S", "A", "M", "X"],
+            ["X", " M", "  A", "   S"],
+            ["S", " A", "  M", "   X"],
+            ["   X", "  M", " A", "S"],
+            ["   S", "  A", " M", "X"],
+        ]
+
+        return sum(blocks | select(lambda b: count_block(self.input, b)))
 
     # @answer(1234)
     def part_2(self) -> int:
