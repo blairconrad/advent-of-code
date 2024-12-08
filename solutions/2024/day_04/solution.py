@@ -70,10 +70,13 @@ class Solution(StrSplitSolution):
 
         return sum(blocks | select(lambda b: count_block(self.input, b)))
 
-    # @answer(1234)
+    @answer(1824)
     def part_2(self) -> int:
-        pass
+        blocks = [
+            ["M M", " A", "S S"],
+            ["S S", " A", "M M"],
+            ["M S", " A", "M S"],
+            ["S M", " A", "S M"],
+        ]
 
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        return sum(blocks | select(lambda b: count_block(self.input, b)))
