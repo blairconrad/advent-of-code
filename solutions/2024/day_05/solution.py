@@ -2,7 +2,8 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/5
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
+from functools import partial
 
 from pipe import select, where
 
@@ -15,29 +16,28 @@ type Update = tuple[int, ...]
 def parse_input(input_str: str) -> tuple[Iterable[Rule], Iterable[Update]]:
     rules_lines, updates_lines = input_str.strip().split("\n\n") | select(str.splitlines)
     return (
-        list(rules_lines | select(lambda s: tuple(s.split("|") | select(int)))),
-        updates_lines | select(lambda s: tuple(s.split(",") | select(int))),
+        list(rules_lines | select(int_tuple("|"))),
+        updates_lines | select(int_tuple(",")),
     )
 
 
-def find_valid(rules: Rule, updates: Iterable[Update]) -> Iterable[tuple[int, ...]]:
-    return updates | where(lambda u: is_valid(u, rules))
+def int_tuple(separator: str) -> Callable[[str], tuple[int, ...]]:
+    return lambda s: tuple(s.split(separator) | select(int))
 
 
-def is_valid(update: Update, rules: Rule) -> bool:
-    if len(update) == 0:
-        return True
-    for rule in rules:
-        if contravenes(update, rule):
-            return False
-    return is_valid(update[1:], rules)
+def find_valid(rules: Iterable[Rule], updates: Iterable[Update]) -> Iterable[tuple[int, ...]]:
+    return updates | where(partial(is_valid, rules=rules))
+
+
+def is_valid(update: Update, rules: Iterable[Rule]) -> bool:
+    return len(update) == 0 or (not any(rules | where(partial(contravenes, update))) and is_valid(update[1:], rules))
 
 
 def contravenes(update: Update, rule: Rule) -> bool:
     return rule[1] == update[0] and rule[0] in update
 
 
-def middle(seq: Iterable[int]) -> int:
+def middle(seq: tuple[int]) -> int:
     return seq[len(seq) // 2]
 
 
