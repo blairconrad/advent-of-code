@@ -2,15 +2,11 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/6
 
-from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Self
 
 from ...base import StrSplitSolution, answer
-
-
-def how_many(iterable: Iterable[int]) -> int:
-    return sum(1 for i in iterable)
+from ...utils.iterables import how_many
 
 
 @dataclass(frozen=True)

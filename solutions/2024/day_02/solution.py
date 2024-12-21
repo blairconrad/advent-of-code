@@ -3,16 +3,14 @@
 # puzzle prompt: https://adventofcode.com/2024/day/2
 
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 from itertools import count, islice, pairwise
 
 from pipe import select, take
 
 from solutions.base import StrSplitSolution, answer
 
-
-def how_many(iterable: Iterable[int]) -> int:
-    return sum(1 for i in iterable)
+from ...utils.iterables import how_many
 
 
 def parse_ints(s: str) -> tuple[int, int, int, int, int]:
