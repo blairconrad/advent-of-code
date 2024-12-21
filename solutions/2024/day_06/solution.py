@@ -2,19 +2,24 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/6
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Self
 
 from ...base import StrSplitSolution, answer
 
 
-@dataclass
+def how_many(iterable: Iterable[int]) -> int:
+    return sum(1 for i in iterable)
+
+
+@dataclass(frozen=True)
 class Step:
     row_move: int
     column_move: int
 
 
-@dataclass
+@dataclass(frozen=True)
 class Position:
     row: int
     column: int
@@ -29,6 +34,13 @@ class Lab:
         self.guard_position = self._find_guard_position()
         self.guard_direction = 0
 
+    def walk_the_guard_out(self) -> list[Position]:
+        positions = set()
+        while self.is_guarded():
+            self.move()
+            positions.add(self.guard_position)
+        return positions
+
     def is_guarded(self) -> bool:
         return self._is_in_lab(self.guard_position)
 
@@ -40,15 +52,7 @@ class Lab:
             step = steps[self.guard_direction]
             next_guard_position = self.guard_position + step
 
-        self._mark_visited(self.guard_position)
         self.guard_position = next_guard_position
-
-    def count_visited_spots(self) -> int:
-        return sum(row.count("X") for row in self.data)
-
-    def _mark_visited(self, position: Position) -> None:
-        row = self.data[position.row]
-        self.data[position.row] = row[: position.column] + "X" + row[position.column + 1 :]
 
     def _is_obstacle(self, position: Position) -> bool:
         return self._is_in_lab(position) and self.data[position.row][position.column] == "#"
@@ -80,10 +84,7 @@ class Solution(StrSplitSolution):
         self.debug(f"{self.input=}")
         lab = Lab(self.input)
         self.debug(f"{lab=}")
-        while lab.is_guarded():
-            lab.move()
-            self.debug(f"{lab=}")
-        return lab.count_visited_spots()
+        return how_many(lab.walk_the_guard_out())
 
     # @answer(1234)
     def part_2(self) -> int:
