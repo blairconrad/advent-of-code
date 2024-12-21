@@ -4,8 +4,11 @@
 
 from collections.abc import Callable, Iterable
 from functools import cmp_to_key, partial
+from typing import Any
 
 from pipe import select, where
+
+from solutions.utils.parsing import split_ints
 
 from ...base import TextSolution, answer
 
@@ -16,13 +19,9 @@ type Update = tuple[int, ...]
 def parse_input(input_str: str) -> tuple[Iterable[Rule], Iterable[Update]]:
     rules_lines, updates_lines = input_str.strip().split("\n\n") | select(str.splitlines)
     return (
-        list(rules_lines | select(int_tuple("|"))),
-        updates_lines | select(int_tuple(",")),
+        list(rules_lines | split_ints("|")),
+        updates_lines | split_ints(","),
     )
-
-
-def int_tuple(separator: str) -> Callable[[str], tuple[int, ...]]:
-    return lambda s: tuple(s.split(separator) | select(int))
 
 
 def middle(seq: tuple[int]) -> int:

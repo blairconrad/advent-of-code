@@ -7,6 +7,7 @@ from itertools import islice, starmap
 from pipe import Pipe, select, sort
 
 from ...base import StrSplitSolution, answer
+from ...utils.parsing import split_ints
 
 
 def count(target: int, iterable: Iterable[int]) -> int:
@@ -26,18 +27,14 @@ def abs_diff(a: int, b: int) -> int:
     return abs(a - b)
 
 
-def parse_ints(s: str) -> tuple[int, int]:
-    return tuple(map(int, s.split()))
-
-
 class Solution(StrSplitSolution):
     _year = 2024
     _day = 1
 
     @answer(2031679)
     def part_1(self) -> int:
-        location_ids = list(self.input | select(parse_ints))
-        self.debug(location_ids)
+        location_ids = list(self.input | split_ints)
+        self.debug(f"{location_ids=}")
         left_column = location_ids | select(nth(0)) | sort
         right_column = location_ids | select(nth(1)) | sort
         self.debug(left_column)
@@ -45,7 +42,7 @@ class Solution(StrSplitSolution):
 
     @answer(19678534)
     def part_2(self) -> int:
-        location_ids = list(self.input | select(parse_ints))
+        location_ids = list(self.input | split_ints)
         left_column = location_ids | select(nth(0))
         right_column = list(location_ids | select(nth(1)))
         return left_column | select(lambda n: n * count(n, right_column)) | Pipe(sum)
