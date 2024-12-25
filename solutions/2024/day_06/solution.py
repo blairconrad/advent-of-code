@@ -24,31 +24,60 @@ class Position:
         return Position(self.row + other.row_move, self.column + other.column_move)
 
 
+@dataclass(frozen=True)
+class Pose:
+    position: Position
+    direction: Step
+
+    def __repr__(self) -> str:
+        return f"<Pose position={self.position} direction={self.direction}>"
+
+
 class Lab:
     def __init__(self, data: list[str]) -> None:
         self.data = data
-        self.guard_position = self._find_guard_position()
-        self.guard_direction = 0
+        self.original_guard_pose = Pose(self._find_original_guard_position(), steps[0])
+        self.guard_pose = self.original_guard_pose
 
-    def walk_the_guard_out(self) -> list[Position]:
-        positions = set()
-        while self.is_guarded():
-            self.move()
-            positions.add(self.guard_position)
-        return positions
+    def calculate_guard_path(self) -> list[Position]:
+        poses = set()
+        while self._is_guarded():
+            poses.add(self.guard_pose)
+            self._move()
+            if self.guard_pose in poses:
+                return poses
+        return {p.position for p in poses}
 
-    def is_guarded(self) -> bool:
-        return self._is_in_lab(self.guard_position)
+    def find_new_obstacles_that_cause_guard_to_loop(self) -> list[Position]:
+        original_path_positions = self.calculate_guard_path()
+        new_obstacles = []
+        for position in original_path_positions:
+            cell = self.data[position.row][position.column]
+            if cell == ".":
+                self.guard_pose = self.original_guard_pose
+                self.data[position.row] = (
+                    self.data[position.row][: position.column] + "#" + self.data[position.row][position.column + 1 :]
+                )
+                self.calculate_guard_path()
+                if self._is_guarded():
+                    # looping!
+                    new_obstacles.append(Position(position.row, position.column))
+                self.data[position.row] = (
+                    self.data[position.row][: position.column] + "." + self.data[position.row][position.column + 1 :]
+                )
+        return new_obstacles
 
-    def move(self) -> None:
-        step = steps[self.guard_direction]
-        next_guard_position = self.guard_position + step
+    def _is_guarded(self) -> bool:
+        return self._is_in_lab(self.guard_pose.position)
+
+    def _move(self) -> None:
+        step = self.guard_pose.direction
+        next_guard_position = self.guard_pose.position + step
         while self._is_obstacle(next_guard_position):
-            self.guard_direction = (self.guard_direction + 1) % len(steps)
-            step = steps[self.guard_direction]
-            next_guard_position = self.guard_position + step
+            step = steps[(steps.index(step) + 1) % len(steps)]
+            next_guard_position = self.guard_pose.position + step
 
-        self.guard_position = next_guard_position
+        self.guard_pose = Pose(next_guard_position, step)
 
     def _is_obstacle(self, position: Position) -> bool:
         return self._is_in_lab(position) and self.data[position.row][position.column] == "#"
@@ -56,7 +85,7 @@ class Lab:
     def _is_in_lab(self, position: Position) -> bool:
         return 0 <= position.row < len(self.data) and 0 <= position.column < len(self.data[position.row])
 
-    def _find_guard_position(self) -> Position:
+    def _find_original_guard_position(self) -> Position:
         for row_number, row in enumerate(self.data):
             for column_number, cell in enumerate(row):
                 if cell == "^":
@@ -65,7 +94,7 @@ class Lab:
         raise ValueError(msg)
 
     def __repr__(self) -> str:
-        return f"<Lab guard_position={self.guard_position} guard_direction={self.guard_direction}>"
+        return f"<Lab guard_pose={self.guard_pose}>"
 
 
 steps = [Step(-1, 0), Step(0, 1), Step(1, 0), Step(0, -1)]
@@ -80,11 +109,14 @@ class Solution(StrSplitSolution):
         self.debug(f"{self.input=}")
         lab = Lab(self.input)
         self.debug(f"{lab=}")
-        return how_many(lab.walk_the_guard_out())
+        return how_many(lab.calculate_guard_path())
 
     # @answer(1234)
     def part_2(self) -> int:
-        pass
+        self.debug(f"{self.input=}")
+        lab = Lab(self.input)
+        self.debug(f"{lab=}")
+        return how_many(lab.find_new_obstacles_that_cause_guard_to_loop())
 
     # @answer((1234, 4567))
     # def solve(self) -> tuple[int, int]:
