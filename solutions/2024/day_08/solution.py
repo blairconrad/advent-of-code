@@ -5,10 +5,11 @@
 from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
+from functools import partial
 from itertools import combinations
 from typing import Self
 
-from pipe import Pipe, chain, select, where
+from pipe import Pipe, chain, select, skip, take
 
 from ...base import StrSplitSolution, answer
 
@@ -17,6 +18,9 @@ from ...base import StrSplitSolution, answer
 class Vector:
     row_change: int
     column_change: int
+
+    def __mul__(self, scalar: int) -> Self:
+        return Vector(self.row_change * scalar, self.column_change * scalar)
 
 
 @dataclass(frozen=True)
@@ -62,9 +66,31 @@ def get_antenna_pairs(antenna_set: list[Position]) -> list[tuple[Position, Posit
     return list(antenna_set | Pipe(combinations, 2))
 
 
-def find_antinodes(antenna_pair: tuple[Position, Position]) -> list[Position]:
+def find_antinode_pairs(city: Grid, antenna_pair: tuple[Position, Position]) -> Iterable[Position]:
     diff = antenna_pair[1] - antenna_pair[0]
-    return [antenna_pair[0] - diff, antenna_pair[1] + diff]
+    step_length = 0
+
+    antinodes = [None]  # dummy value to get in loop
+    while len(antinodes) > 0:
+        step = diff * step_length
+
+        antinodes = []
+        antinode = antenna_pair[0] - step
+        if city.contains(antinode):
+            antinodes.append(antinode)
+
+        antinode = antenna_pair[1] + step
+        if city.contains(antinode):
+            antinodes.append(antinode)
+
+        if len(antinodes) > 0:
+            yield antinodes
+
+        step_length += 1
+
+
+def find_primary_antinode_pairs(city: Grid, antenna_pair: tuple[Position, Position]) -> Iterable[Position]:
+    yield from find_antinode_pairs(city, antenna_pair) | skip(1) | take(1)
 
 
 class Solution(StrSplitSolution):  # or TextSolution, etc
@@ -79,16 +105,22 @@ class Solution(StrSplitSolution):  # or TextSolution, etc
                 find_antennae(city)
                 | select(get_antenna_pairs)
                 | chain
-                | select(find_antinodes)
-                | chain
-                | where(city.contains)
+                | select(partial(find_primary_antinode_pairs, city))
+                | chain  # unpack results from pair of towers
+                | chain  # unpack possible pairs of antinodes
             )
         )
 
-    # @answer(1234)
+    @answer(1259)
     def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        city = Grid(self.input)
+        return len(
+            set(
+                find_antennae(city)
+                | select(get_antenna_pairs)
+                | chain
+                | select(partial(find_antinode_pairs, city))
+                | chain  # unpack results from pair of towers
+                | chain  # unpack possible pairs of antinodes
+            )
+        )
