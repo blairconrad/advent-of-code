@@ -11,6 +11,8 @@ from typing import Self
 
 from pipe import Pipe, chain, select, skip, take
 
+from solutions.utils.iterables import tee
+
 from ...base import StrSplitSolution, answer
 
 
@@ -108,6 +110,7 @@ class Solution(StrSplitSolution):  # or TextSolution, etc
                 | select(partial(find_primary_antinode_pairs, city))
                 | chain  # unpack results from pair of towers
                 | chain  # unpack possible pairs of antinodes
+                | tee(self.debug)
             )
         )
 
