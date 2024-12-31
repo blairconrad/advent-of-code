@@ -66,6 +66,8 @@ def pack(files: list[File], spaces: list[Space]) -> None:
     next_file_index = len(files) - 1
     while len(spaces) > 0 and spaces[0].start < files[next_file_index].start:
         for i in range(len(spaces)):
+            if spaces[i].start > files[next_file_index].start:
+                break
             if spaces[i].length == files[next_file_index].length:
                 files[next_file_index].start = spaces[i].start
                 spaces.pop(i)
@@ -93,10 +95,11 @@ class Solution(TextSolution):
         self.debug(files)
         return sum(files | select(File.weight))
 
-    # @answer(1234)
+    @answer(6398096697992)
     def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        files, spaces = parse_input(self.input)
+        self.debug(files)
+        self.debug(spaces)
+        pack(files, spaces)
+        self.debug(files)
+        return sum(files | select(File.weight))
