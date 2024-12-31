@@ -22,13 +22,12 @@ def find_neighbours_with_value(park: Grid, start: Position, value: str) -> Itera
 
 
 def find_reachable(park: Grid, start: Position, height_progression: str) -> Iterable[Position]:
-    starts = {start}
-    for height in height_progression:
-        next_starts = set()
-        for this_start in starts:
-            next_starts |= set(find_neighbours_with_value(park, this_start, height))
-        starts = next_starts
-    return starts
+    if height_progression == "":
+        return [start]
+    results: list[Position] = []
+    for neighbour in find_neighbours_with_value(park, start, height_progression[0]):
+        results.extend(find_reachable(park, neighbour, height_progression[1:]))
+    return results
 
 
 class Solution(StrSplitSolution):
@@ -39,12 +38,10 @@ class Solution(StrSplitSolution):
     def part_1(self) -> int:
         park = Grid(self.input)
         trail_heads = park.enumerate() | where(lambda state: state[1] == "0") | select(lambda state: state[0])
-        return sum(trail_heads | select(lambda pos: how_many(find_reachable(park, pos, "123456789"))))
+        return sum(trail_heads | select(lambda pos: how_many(set(find_reachable(park, pos, "123456789")))))
 
-    # @answer(1234)
+    @answer(1110)
     def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        park = Grid(self.input)
+        trail_heads = park.enumerate() | where(lambda state: state[1] == "0") | select(lambda state: state[0])
+        return sum(trail_heads | select(lambda pos: how_many(find_reachable(park, pos, "123456789"))))

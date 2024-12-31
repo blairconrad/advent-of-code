@@ -4,7 +4,7 @@ from typing import Any
 from pipe import Pipe
 
 
-def how_many(iterable: Iterable[int]) -> int:
+def how_many(iterable: Iterable[Any]) -> int:
     return sum(1 for i in iterable)
 
 
