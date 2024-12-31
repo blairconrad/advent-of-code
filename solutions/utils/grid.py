@@ -53,3 +53,6 @@ class Grid:
 
     def contains(self, position: Position) -> bool:
         return 0 <= position.row < len(self.grid) and 0 <= position.column < len(self.grid[position.row])
+
+    def get(self, position: Position, default: str | None) -> str | None:
+        return self[position] if self.contains(position) else default
