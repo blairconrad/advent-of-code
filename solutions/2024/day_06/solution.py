@@ -3,31 +3,17 @@
 # puzzle prompt: https://adventofcode.com/2024/day/6
 
 from dataclasses import dataclass
-from typing import Self
+
+from solutions.utils.grid import Position, Vector
 
 from ...base import StrSplitSolution, answer
 from ...utils.iterables import how_many
 
 
 @dataclass(frozen=True)
-class Step:
-    row_move: int
-    column_move: int
-
-
-@dataclass(frozen=True)
-class Position:
-    row: int
-    column: int
-
-    def __add__(self, other: Step) -> Self:
-        return Position(self.row + other.row_move, self.column + other.column_move)
-
-
-@dataclass(frozen=True)
 class Pose:
     position: Position
-    direction: Step
+    direction: Vector
 
     def __repr__(self) -> str:
         return f"<Pose position={self.position} direction={self.direction}>"
@@ -97,7 +83,7 @@ class Lab:
         return f"<Lab guard_pose={self.guard_pose}>"
 
 
-steps = [Step(-1, 0), Step(0, 1), Step(1, 0), Step(0, -1)]
+steps = [Vector(-1, 0), Vector(0, 1), Vector(1, 0), Vector(0, -1)]
 
 
 class Solution(StrSplitSolution):

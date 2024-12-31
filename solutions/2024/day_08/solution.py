@@ -4,56 +4,15 @@
 
 from collections import defaultdict
 from collections.abc import Iterable
-from dataclasses import dataclass
 from functools import partial
 from itertools import combinations
-from typing import Self
 
 from pipe import Pipe, chain, select, skip, take
 
+from solutions.utils.grid import Grid, Position
 from solutions.utils.iterables import tee
 
 from ...base import StrSplitSolution, answer
-
-
-@dataclass(frozen=True)
-class Vector:
-    row_change: int
-    column_change: int
-
-    def __mul__(self, scalar: int) -> Self:
-        return Vector(self.row_change * scalar, self.column_change * scalar)
-
-
-@dataclass(frozen=True)
-class Position:
-    row: int
-    column: int
-
-    def __add__(self, pos: Vector) -> Self:
-        return Position(self.row + pos.row_change, self.column + pos.column_change)
-
-    def __sub__(self, other: Self | Vector) -> Vector:
-        match other:
-            case Position(row, column):
-                return Vector(self.row - row, self.column - column)
-            case Vector(row_change, column_change):
-                return Position(self.row - row_change, self.column - column_change)
-
-
-class Grid:
-    def __init__(self, grid: list[str]) -> None:
-        self.grid = grid
-
-    def enumerate(self) -> Iterable[tuple[Position, str]]:
-        return (
-            (Position(row, column), self.grid[row][column])
-            for row in range(len(self.grid))
-            for column in range(len(self.grid[row]))
-        )
-
-    def contains(self, position: Position) -> bool:
-        return 0 <= position.row < len(self.grid) and 0 <= position.column < len(self.grid[position.row])
 
 
 def find_antennae(grid: Grid) -> Iterable[list[Position]]:
