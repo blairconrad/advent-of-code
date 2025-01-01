@@ -2,6 +2,11 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/11
 
+from collections.abc import Iterable
+from functools import cache
+
+from pipe import Pipe
+
 from ...base import IntSplitSolution, answer
 
 
@@ -16,16 +21,26 @@ def split_int(n: int) -> list[int] | None:
     return [int(first_half), int(second_half)]
 
 
-def blink(stones: list[int]) -> list[int]:
-    new_stones = []
+def blink(stone: int) -> list[int]:
+    if stone == 0:
+        return [1]
+    if (parts := split_int(stone)) is not None:
+        return parts
+    return [stone * 2024]
+
+
+@Pipe
+def count_blinks(stones: Iterable[int], num_blinks: int) -> Iterable[int]:
     for stone in stones:
-        if stone == 0:
-            new_stones.append(1)
-        elif (parts := split_int(stone)) is not None:
-            new_stones.extend(parts)
-        else:
-            new_stones.append(stone * 2024)
-    return new_stones
+        yield count_blinks_output(stone, num_blinks)
+
+
+@cache
+def count_blinks_output(stone: int, num_blinks: int) -> int:
+    if num_blinks == 0:
+        return 1
+    stones = blink(stone)
+    return sum(stones | count_blinks(num_blinks - 1))
 
 
 class Solution(IntSplitSolution):
@@ -37,15 +52,12 @@ class Solution(IntSplitSolution):
     @answer(216996)
     def part_1(self) -> int:
         stones = self.input
-        self.debug(stones)
-        for _ in range(25):
-            stones = blink(stones)
-            self.debug(stones)
-        return len(stones)
+        return sum(stones | count_blinks(25))
 
-    # @answer(1234)
+    @answer(257335372288947)
     def part_2(self) -> int:
-        pass
+        stones = self.input
+        return sum(stones | count_blinks(75))
 
     # @answer((1234, 4567))
     # def solve(self) -> tuple[int, int]:
