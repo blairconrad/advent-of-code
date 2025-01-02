@@ -2,8 +2,8 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/12
 
+from collections import defaultdict
 from collections.abc import Iterable
-from dataclasses import dataclass
 
 from pipe import select
 
@@ -52,6 +52,32 @@ def calculate_perimeter_segments(plot: list[Position]) -> dict[Vector, list[Posi
     return results
 
 
+def calculate_perimeter(plot: list[Position]) -> int:
+    return sum(calculate_perimeter_segments(plot).values() | select(len))
+
+
+def calculate_number_of_sides(plot: list[Position]) -> int:
+    segments_map = calculate_perimeter_segments(plot)
+
+    def count_sides(segments: list[Position], start_direction: Vector, end_direction: Vector) -> int:
+        count = 0
+        while len(segments) > 0:
+            first_segment = last_segment = segments.pop()
+            count += 1
+            while (first_segment := first_segment + start_direction) in segments:
+                segments.remove(first_segment)
+            while (last_segment := last_segment + end_direction) in segments:
+                segments.remove(last_segment)
+        return count
+
+    return (
+        count_sides(segments_map[north], west, east)
+        + count_sides(segments_map[south], west, east)
+        + count_sides(segments_map[west], north, south)
+        + count_sides(segments_map[east], north, south)
+    )
+
+
 class Solution(StrSplitSolution):
     _year = 2024
     _day = 12
@@ -61,10 +87,9 @@ class Solution(StrSplitSolution):
         garden = Grid(self.input)
         return sum(split_into_plots(garden) | select(lambda p: len(p) * calculate_perimeter(p)))
 
-    # @answer(1234)
+    @answer(891106)
     def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        garden = Grid(self.input)
+        for plot in split_into_plots(garden):
+            self.debug(plot)
+        return sum(split_into_plots(garden) | select(lambda p: len(p) * calculate_number_of_sides(p)))
