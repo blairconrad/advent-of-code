@@ -11,50 +11,45 @@ from solutions.utils.grid import Grid, Position, Vector
 
 from ...base import StrSplitSolution, answer
 
+north = Vector(-1, 0)
+east = Vector(0, 1)
+south = Vector(1, 0)
+west = Vector(0, -1)
 
-@dataclass
-class PlotStats:
-    area: int
-    perimeter: int
-
-
-directions: tuple[Vector, Vector, Vector, Vector] = (Vector(0, 1), Vector(1, 0), Vector(0, -1), Vector(-1, 0))
+directions = (north, east, south, west)
 
 
-def survey_plot(seen: set[Position], start: Position, grid: Grid) -> PlotStats:
-    plot: set[Position] = set()
-    fringe = {start}
-    perimeter = 0
-
-    while len(fringe) > 0:
-        position = fringe.pop()
-        if position in plot:
+def split_into_plots(garden: Grid) -> Iterable[list[Position]]:
+    seen: set[Position] = set()
+    for start in garden.positions():
+        if start in seen:
             continue
+        plot: list[Position] = []
+        fringe = {start}
 
-        plot.add(position)
-        plot_type = grid[position]
-        for direction in directions:
-            neighbour_position = position + direction
-            neighbour_type = grid.get(neighbour_position, None)
-
-            if neighbour_type is None or neighbour_type != plot_type:
-                perimeter += 1
+        while len(fringe) > 0:
+            position = fringe.pop()
+            if position in plot:
                 continue
 
-            fringe.add(neighbour_position)
+            plot.append(position)
+            plot_type = garden[position]
+            for direction in directions:
+                neighbour_position = position + direction
+                if garden.contains(neighbour_position) and garden[neighbour_position] == plot_type:
+                    fringe.add(neighbour_position)
 
-    seen |= plot
-    return PlotStats(len(plot), perimeter=perimeter)
+        seen |= set(plot)
+        yield plot
 
 
-def describe_plots(grid: Grid) -> Iterable[PlotStats]:
-    seen: set[Position] = set()
-    plot_stats = []
-    for position in grid.positions():
-        if position in seen:
-            continue
-        plot_stats.append(survey_plot(seen, position, grid))
-    return plot_stats
+def calculate_perimeter_segments(plot: list[Position]) -> dict[Vector, list[Position]]:
+    results: dict[Vector, list[Position]] = defaultdict(list)
+    for direction in directions:
+        for position in plot:
+            if position + direction not in plot:
+                results[direction].append(position)
+    return results
 
 
 class Solution(StrSplitSolution):
@@ -64,7 +59,7 @@ class Solution(StrSplitSolution):
     @answer(1434856)
     def part_1(self) -> int:
         garden = Grid(self.input)
-        return sum(describe_plots(garden) | select(lambda plot: plot.area * plot.perimeter))
+        return sum(split_into_plots(garden) | select(lambda p: len(p) * calculate_perimeter(p)))
 
     # @answer(1234)
     def part_2(self) -> int:
