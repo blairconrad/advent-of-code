@@ -2,19 +2,11 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/9
 
-from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from typing import Any
 
-from pipe import Pipe, select
+from pipe import select
 
 from ...base import TextSolution, answer
-
-
-@Pipe
-def starmap(iterable: Iterable[tuple[Any, ...]], func: Callable[[tuple[Any, ...]], Any]) -> Iterable[int]:
-    for args in iterable:
-        yield func(*args)
 
 
 @dataclass

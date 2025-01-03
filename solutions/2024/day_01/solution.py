@@ -1,22 +1,18 @@
 # Generated using @xavdid's AoC Python Template: https://github.com/xavdid/advent-of-code-python-template
 
 # puzzle prompt: https://adventofcode.com/2024/day/1
-from collections.abc import Callable, Iterable
-from itertools import islice, starmap
+from collections.abc import Iterable
+from itertools import islice
 
 from pipe import Pipe, select, sort
 
 from ...base import StrSplitSolution, answer
+from ...utils.iterables import starmap
 from ...utils.parsing import split_ints
 
 
 def count(target: int, iterable: Iterable[int]) -> int:
     return sum(1 for i in iterable if i == target)
-
-
-@Pipe
-def my_starmap(iterable: Iterable[tuple[int, int]], func: Callable[[tuple[int, int]], int]) -> Iterable[int]:
-    return starmap(func, iterable)
 
 
 def nth(n: int) -> int:
@@ -38,7 +34,7 @@ class Solution(StrSplitSolution):
         left_column = location_ids | select(nth(0)) | sort
         right_column = location_ids | select(nth(1)) | sort
         self.debug(left_column)
-        return zip(left_column, right_column, strict=False) | my_starmap(abs_diff) | Pipe(sum)
+        return zip(left_column, right_column, strict=False) | starmap(abs_diff) | Pipe(sum)
 
     @answer(19678534)
     def part_2(self) -> int:

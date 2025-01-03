@@ -2,22 +2,15 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/13
 
-from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from re import DOTALL, findall
-from typing import Any
 
-from pipe import Pipe, select, where
+from pipe import select, where
 
 from solutions.utils.iterables import tee
 
 from ...base import TextSolution, answer
-
-
-@Pipe
-def starmap(iterable: Iterable[tuple[Any, ...]], func: Callable[[tuple[Any, ...]], Any]) -> Iterable[int]:
-    for args in iterable:
-        yield func(*args)
+from ...utils.iterables import starmap
 
 
 @dataclass
