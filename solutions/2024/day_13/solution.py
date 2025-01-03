@@ -2,6 +2,7 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/13
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from re import DOTALL, findall
 
@@ -39,12 +40,17 @@ def cheapest_cost(solutions: list[tuple[int, int]]) -> int:
     return min(solutions | select(cost))
 
 
+def shift_it(claw_round: ClawRound) -> ClawRound:
+    claw_round.prize_x += 10000000000000
+    claw_round.prize_y += 10000000000000
+    return claw_round
+
+
 class Solution(TextSolution):
     _year = 2024
     _day = 13
 
-    @answer(31897)
-    def part_1(self) -> int:
+    def find_cheapest(self, round_transform: Callable[[ClawRound], ClawRound]) -> int:
         return sum(
             findall(
                 r"Button A: X\+(\d+), Y\+(\d+)\nButton B: X\+(\d+), Y\+(\d+)\nPrize: X=(\d+), Y=(\d+)",
@@ -53,6 +59,7 @@ class Solution(TextSolution):
             )
             | select(lambda x: [int(i) for i in x])
             | starmap(ClawRound)
+            | select(round_transform)
             | tee(self.debug)
             | select(ClawRound.find_solutions)
             | where(bool)
@@ -60,9 +67,13 @@ class Solution(TextSolution):
             | select(cheapest_cost)
         )
 
-    # @answer(1234)
+    @answer(31897)
+    def part_1(self) -> int:
+        return self.find_cheapest(lambda x: x)
+
+    @answer(87596249540359)
     def part_2(self) -> int:
-        pass
+        return self.find_cheapest(shift_it)
 
     # @answer((1234, 4567))
     # def solve(self) -> tuple[int, int]:
