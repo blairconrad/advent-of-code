@@ -23,19 +23,13 @@ class ClawRound:
     prize_y: int
 
     def find_solutions(self) -> list[tuple[int, int]]:
-        a = 0
-        x = 0
-        y = 0
-        solutions = []
-        while x <= self.prize_x and y <= self.prize_y:
-            b_div, b_mod = divmod(self.prize_x - x, self.b_x)
-            if b_mod == 0 and b_div * self.b_y == self.prize_y - y:
-                solutions.append((a, b_div))
-
-            a += 1
-            x += self.a_x
-            y += self.a_y
-        return solutions
+        a, remainder = divmod(
+            self.b_y * self.prize_x - self.b_x * self.prize_y, self.a_x * self.b_y - self.a_y * self.b_x
+        )
+        if remainder != 0:
+            return []
+        b = (self.prize_x - a * self.a_x) // self.b_x
+        return [(a, b)]
 
 
 def cheapest_cost(solutions: list[tuple[int, int]]) -> int:
