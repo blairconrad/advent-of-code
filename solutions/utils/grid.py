@@ -41,6 +41,9 @@ class Grid:
     def __getitem__(self, key: Position) -> str:
         return self.grid[key.row][key.column]
 
+    def __setitem__(self, key: Position, value: str) -> None:
+        self.grid[key.row] = self.grid[key.row][: key.column] + value + self.grid[key.row][key.column + 1 :]
+
     def enumerate(self) -> Iterable[tuple[Position, str]]:
         return (
             (Position(row, column), self.grid[row][column])
@@ -56,3 +59,6 @@ class Grid:
 
     def get(self, position: Position, default: str | None) -> str | None:
         return self[position] if self.contains(position) else default
+
+    def __repr__(self) -> str:
+        return "\n".join(self.grid)
