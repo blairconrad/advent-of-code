@@ -27,21 +27,28 @@ def find_robot(warehouse: Grid) -> Position:
     return next(warehouse.enumerate() | where(lambda tile: tile[1] == ROBOT) | select(lambda tile: tile[0]))
 
 
+def push_boxes(warehouse: Grid, box_position: Position, direction: Vector) -> bool:
+    new_box_position = box_position + direction
+    if warehouse[new_box_position] == WALL:
+        return False
+    if warehouse[new_box_position] == EMPTY or (
+        warehouse[new_box_position] == BOX and push_boxes(warehouse, new_box_position, direction)
+    ):
+        warehouse[new_box_position] = warehouse[box_position]
+        return True
+    return False
+
+
 def move_robot(warehouse: Grid, robot: Position, direction_name: str) -> Position:
     direction = directions[direction_name]
     new_robot_position = robot + direction
     if warehouse[new_robot_position] == WALL:
         return robot
-    if warehouse[new_robot_position] == BOX:
-        box_position = new_robot_position
-        while warehouse[box_position] == BOX:
-            box_position += direction
-        if warehouse[box_position] == WALL:
-            return robot
-        warehouse[box_position] = BOX
-    warehouse[new_robot_position] = ROBOT
-    warehouse[robot] = EMPTY
-    return new_robot_position
+    if warehouse[new_robot_position] == EMPTY or push_boxes(warehouse, new_robot_position, direction):
+        warehouse[new_robot_position] = ROBOT
+        warehouse[robot] = EMPTY
+        return new_robot_position
+    return robot
 
 
 class Solution(StrSplitSolution):
