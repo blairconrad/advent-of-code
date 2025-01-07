@@ -4,7 +4,7 @@
 
 from dataclasses import dataclass
 
-from solutions.utils.grid import CARDINAL_DIRECTIONS, NORTH, Position, Vector
+from solutions.utils.grid import NORTH, Position, Vector
 
 from ...base import StrSplitSolution, answer
 from ...utils.iterables import how_many
@@ -60,7 +60,7 @@ class Lab:
         step = self.guard_pose.direction
         next_guard_position = self.guard_pose.position + step
         while self._is_obstacle(next_guard_position):
-            step = CARDINAL_DIRECTIONS[(CARDINAL_DIRECTIONS.index(step) + 1) % len(CARDINAL_DIRECTIONS)]
+            step = step.turn_right()
             next_guard_position = self.guard_pose.position + step
 
         self.guard_pose = Pose(next_guard_position, step)

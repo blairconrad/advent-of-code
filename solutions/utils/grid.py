@@ -8,6 +8,12 @@ class Vector:
     row_change: int
     column_change: int
 
+    def turn_left(self) -> Self:
+        return Vector(-self.column_change, self.row_change)
+
+    def turn_right(self) -> Self:
+        return Vector(self.column_change, -self.row_change)
+
     def __mul__(self, scalar: int) -> Self:
         return Vector(self.row_change * scalar, self.column_change * scalar)
 

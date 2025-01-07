@@ -12,14 +12,6 @@ from solutions.utils.grid import CARDINAL_DIRECTIONS, EAST, Grid, Position, Vect
 from ...base import StrSplitSolution, answer
 
 
-def turn_left(v: Vector) -> Vector:
-    return Vector(-v.column_change, v.row_change)
-
-
-def turn_right(v: Vector) -> Vector:
-    return Vector(v.column_change, -v.row_change)
-
-
 @dataclass(frozen=True)
 class Pose:
     position: Position
@@ -37,8 +29,8 @@ class State:
 
 def generate_states(state: State, maze: Grid) -> list[State]:
     moves = [
-        State(Pose(state.pose.position, turn_left(state.pose.direction)), state.cost + 1000),
-        State(Pose(state.pose.position, turn_right(state.pose.direction)), state.cost + 1000),
+        State(Pose(state.pose.position, state.pose.direction.turn_left()), state.cost + 1000),
+        State(Pose(state.pose.position, state.pose.direction.turn_right()), state.cost + 1000),
     ]
 
     new_pose = Pose(state.pose.position - state.pose.direction, state.pose.direction)
