@@ -12,6 +12,14 @@ class Vector:
         return Vector(self.row_change * scalar, self.column_change * scalar)
 
 
+NORTH = Vector(-1, 0)
+EAST = Vector(0, 1)
+SOUTH = Vector(1, 0)
+WEST = Vector(0, -1)
+
+CARDINAL_DIRECTIONS = (NORTH, EAST, SOUTH, WEST)
+
+
 @dataclass(frozen=True)
 class Position:
     row: int

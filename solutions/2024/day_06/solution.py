@@ -4,7 +4,7 @@
 
 from dataclasses import dataclass
 
-from solutions.utils.grid import Position, Vector
+from solutions.utils.grid import CARDINAL_DIRECTIONS, NORTH, Position, Vector
 
 from ...base import StrSplitSolution, answer
 from ...utils.iterables import how_many
@@ -22,7 +22,7 @@ class Pose:
 class Lab:
     def __init__(self, data: list[str]) -> None:
         self.data = data
-        self.original_guard_pose = Pose(self._find_original_guard_position(), steps[0])
+        self.original_guard_pose = Pose(self._find_original_guard_position(), NORTH)
         self.guard_pose = self.original_guard_pose
 
     def calculate_guard_path(self) -> list[Position]:
@@ -60,7 +60,7 @@ class Lab:
         step = self.guard_pose.direction
         next_guard_position = self.guard_pose.position + step
         while self._is_obstacle(next_guard_position):
-            step = steps[(steps.index(step) + 1) % len(steps)]
+            step = CARDINAL_DIRECTIONS[(CARDINAL_DIRECTIONS.index(step) + 1) % len(CARDINAL_DIRECTIONS)]
             next_guard_position = self.guard_pose.position + step
 
         self.guard_pose = Pose(next_guard_position, step)
@@ -81,9 +81,6 @@ class Lab:
 
     def __repr__(self) -> str:
         return f"<Lab guard_pose={self.guard_pose}>"
-
-
-steps = [Vector(-1, 0), Vector(0, 1), Vector(1, 0), Vector(0, -1)]
 
 
 class Solution(StrSplitSolution):

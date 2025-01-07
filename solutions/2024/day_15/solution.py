@@ -6,15 +6,15 @@ from collections.abc import Iterable
 
 from pipe import select, where
 
-from solutions.utils.grid import Grid, Position, Vector
+from solutions.utils.grid import EAST, NORTH, SOUTH, WEST, Grid, Position, Vector
 
 from ...base import StrSplitSolution, answer
 
 directions = {
-    "^": Vector(-1, 0),
-    "v": Vector(1, 0),
-    "<": Vector(0, -1),
-    ">": Vector(0, 1),
+    "^": NORTH,
+    "v": SOUTH,
+    "<": WEST,
+    ">": EAST,
 }
 
 LEFT_BOX = "["

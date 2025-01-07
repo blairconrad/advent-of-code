@@ -7,16 +7,9 @@ from collections.abc import Iterable
 
 from pipe import select
 
-from solutions.utils.grid import Grid, Position, Vector
+from solutions.utils.grid import CARDINAL_DIRECTIONS, EAST, NORTH, SOUTH, WEST, Grid, Position, Vector
 
 from ...base import StrSplitSolution, answer
-
-north = Vector(-1, 0)
-east = Vector(0, 1)
-south = Vector(1, 0)
-west = Vector(0, -1)
-
-directions = (north, east, south, west)
 
 
 def split_into_plots(garden: Grid) -> Iterable[list[Position]]:
@@ -34,7 +27,7 @@ def split_into_plots(garden: Grid) -> Iterable[list[Position]]:
 
             plot.append(position)
             plot_type = garden[position]
-            for direction in directions:
+            for direction in CARDINAL_DIRECTIONS:
                 neighbour_position = position + direction
                 if garden.contains(neighbour_position) and garden[neighbour_position] == plot_type:
                     fringe.add(neighbour_position)
@@ -45,7 +38,7 @@ def split_into_plots(garden: Grid) -> Iterable[list[Position]]:
 
 def calculate_perimeter_segments(plot: list[Position]) -> dict[Vector, list[Position]]:
     results: dict[Vector, list[Position]] = defaultdict(list)
-    for direction in directions:
+    for direction in CARDINAL_DIRECTIONS:
         for position in plot:
             if position + direction not in plot:
                 results[direction].append(position)
@@ -71,10 +64,10 @@ def calculate_number_of_sides(plot: list[Position]) -> int:
         return count
 
     return (
-        count_sides(segments_map[north], west, east)
-        + count_sides(segments_map[south], west, east)
-        + count_sides(segments_map[west], north, south)
-        + count_sides(segments_map[east], north, south)
+        count_sides(segments_map[NORTH], WEST, EAST)
+        + count_sides(segments_map[SOUTH], WEST, EAST)
+        + count_sides(segments_map[WEST], NORTH, SOUTH)
+        + count_sides(segments_map[EAST], NORTH, SOUTH)
     )
 
 

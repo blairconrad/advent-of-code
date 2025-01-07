@@ -6,16 +6,14 @@ from collections.abc import Iterable
 
 from pipe import select, where
 
-from solutions.utils.grid import Grid, Position, Vector
+from solutions.utils.grid import CARDINAL_DIRECTIONS, Grid, Position
 from solutions.utils.iterables import how_many
 
 from ...base import StrSplitSolution, answer
 
-directions = (Vector(0, 1), Vector(1, 0), Vector(0, -1), Vector(-1, 0))
-
 
 def find_neighbours_with_value(park: Grid, start: Position, value: str) -> Iterable[Position]:
-    for direction in directions:
+    for direction in CARDINAL_DIRECTIONS:
         neighbour = start + direction
         if park.get(neighbour, None) == value:
             yield neighbour

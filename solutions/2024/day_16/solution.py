@@ -7,16 +7,9 @@ from dataclasses import dataclass
 
 from pipe import where
 
-from solutions.utils.grid import Grid, Position, Vector
+from solutions.utils.grid import CARDINAL_DIRECTIONS, EAST, Grid, Position, Vector
 
 from ...base import StrSplitSolution, answer
-
-north = Vector(-1, 0)
-east = Vector(0, 1)
-south = Vector(1, 0)
-west = Vector(0, -1)
-
-directions = (north, east, south, west)
 
 
 def turn_left(v: Vector) -> Vector:
@@ -61,14 +54,14 @@ class Solution(StrSplitSolution):
     @answer(104516)
     def part_1(self) -> int:
         maze = Grid(self.input)
-        start_pose = Pose(next(maze.enumerate() | where(lambda p: p[1] == "S"))[0], east)
+        start_pose = Pose(next(maze.enumerate() | where(lambda p: p[1] == "S"))[0], EAST)
         end = next(maze.enumerate() | where(lambda p: p[1] == "E"))
         self.debug(maze)
         self.debug(start_pose)
         self.debug(end)
 
         fringe: list[State] = []
-        for d in directions:
+        for d in CARDINAL_DIRECTIONS:
             heapq.heappush(fringe, State(Pose(end[0], d), 0))
         seen = {s.pose: s.cost for s in fringe}
 
