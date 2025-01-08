@@ -2,21 +2,10 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/6
 
-from dataclasses import dataclass
-
-from solutions.utils.grid import NORTH, Position, Vector
+from solutions.utils.grid import NORTH, Pose, Position
 
 from ...base import StrSplitSolution, answer
 from ...utils.iterables import how_many
-
-
-@dataclass(frozen=True)
-class Pose:
-    position: Position
-    direction: Vector
-
-    def __repr__(self) -> str:
-        return f"<Pose position={self.position} direction={self.direction}>"
 
 
 class Lab:

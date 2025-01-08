@@ -7,15 +7,9 @@ from dataclasses import dataclass
 
 from pipe import where
 
-from solutions.utils.grid import CARDINAL_DIRECTIONS, EAST, Grid, Position, Vector
+from solutions.utils.grid import CARDINAL_DIRECTIONS, EAST, Grid, Pose
 
 from ...base import StrSplitSolution, answer
-
-
-@dataclass(frozen=True)
-class Pose:
-    position: Position
-    direction: Vector
 
 
 @dataclass(frozen=True, eq=True)

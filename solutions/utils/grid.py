@@ -48,6 +48,12 @@ class Position:
                 return Position(self.row - row_change, self.column - column_change)
 
 
+@dataclass(frozen=True)
+class Pose:
+    position: Position
+    direction: Vector
+
+
 class Grid:
     def __init__(self, grid: list[str]) -> None:
         self.grid = grid
