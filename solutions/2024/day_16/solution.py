@@ -4,6 +4,7 @@
 
 import heapq
 from dataclasses import dataclass
+from typing import Self
 
 from pipe import where
 
@@ -12,24 +13,26 @@ from solutions.utils.grid import CARDINAL_DIRECTIONS, EAST, Grid, Pose
 from ...base import StrSplitSolution, answer
 
 
-@dataclass(frozen=True, eq=True)
-class State:
-    pose: Pose
+@dataclass
+class Path:
+    poses: tuple[Pose, ...]
     cost: int
 
-    def __lt__(self, other: "State") -> bool:
+    def __lt__(self, other: Self) -> bool:
         return self.cost < other.cost
 
 
-def generate_states(state: State, maze: Grid) -> list[State]:
+def generate_paths(path: Path, maze: Grid) -> list[Path]:
+    starting_position = path.poses[0].position
+    starting_direction = path.poses[0].direction
     moves = [
-        State(Pose(state.pose.position, state.pose.direction.turn_left()), state.cost + 1000),
-        State(Pose(state.pose.position, state.pose.direction.turn_right()), state.cost + 1000),
+        Path((Pose(starting_position, starting_direction.turn_left()), *path.poses), path.cost + 1000),
+        Path((Pose(starting_position, starting_direction.turn_right()), *path.poses), path.cost + 1000),
     ]
 
-    new_pose = Pose(state.pose.position - state.pose.direction, state.pose.direction)
+    new_pose = Pose(starting_position - starting_direction, starting_direction)
     if maze[new_pose.position] != "#":
-        moves.append(State(new_pose, state.cost + 1))
+        moves.append(Path((new_pose, *path.poses), path.cost + 1))
     return moves
 
 
@@ -46,21 +49,21 @@ class Solution(StrSplitSolution):
         self.debug(start_pose)
         self.debug(end)
 
-        fringe: list[State] = []
+        fringe: list[Path] = []
         for d in CARDINAL_DIRECTIONS:
-            heapq.heappush(fringe, State(Pose(end[0], d), 0))
-        seen = {s.pose: s.cost for s in fringe}
+            heapq.heappush(fringe, Path((Pose(end[0], d),), 0))
+        seen = {path.poses[0]: path for path in fringe}
 
         self.debug(fringe)
         while len(fringe) > 0:
-            cheapest_state = heapq.heappop(fringe)
-            if cheapest_state.pose == start_pose:
-                return cheapest_state.cost
-            next_states = generate_states(cheapest_state, maze)
-            for state in next_states:
-                if state.pose not in seen or state.cost < seen[state.pose]:
-                    heapq.heappush(fringe, state)
-                    seen[state.pose] = state.cost
+            cheapest_path = heapq.heappop(fringe)
+            if cheapest_path.poses[0] == start_pose:
+                return cheapest_path.cost
+            next_paths = generate_paths(cheapest_path, maze)
+            for path in next_paths:
+                if path.poses[0] not in seen or path.cost < seen[path.poses[0]].cost:
+                    heapq.heappush(fringe, path)
+                    seen[path.poses[0]] = path
         return 0
 
     # @answer(1234)
