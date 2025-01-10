@@ -4,9 +4,10 @@
 
 import heapq
 from dataclasses import dataclass
+from operator import attrgetter
 from typing import Self
 
-from pipe import where
+from pipe import chain, select, where
 
 from solutions.utils.grid import CARDINAL_DIRECTIONS, EAST, Grid, Pose
 
@@ -40,8 +41,8 @@ class Solution(StrSplitSolution):
     _year = 2024
     _day = 16
 
-    @answer(104516)
-    def part_1(self) -> int:
+    @answer((104516, 545))
+    def solve(self) -> tuple[int, int]:
         maze = Grid(self.input)
         start_pose = Pose(next(maze.enumerate() | where(lambda p: p[1] == "S"))[0], EAST)
         end = next(maze.enumerate() | where(lambda p: p[1] == "E"))
@@ -52,24 +53,25 @@ class Solution(StrSplitSolution):
         fringe: list[Path] = []
         for d in CARDINAL_DIRECTIONS:
             heapq.heappush(fringe, Path((Pose(end[0], d),), 0))
-        seen = {path.poses[0]: path for path in fringe}
+        min_costs = {path.poses[0]: 0 for path in fringe}
 
         self.debug(fringe)
+        paths_from_start: list[Path] = []
         while len(fringe) > 0:
             cheapest_path = heapq.heappop(fringe)
+            if len(paths_from_start) > 0 and cheapest_path.cost > paths_from_start[0].cost:
+                break
             if cheapest_path.poses[0] == start_pose:
-                return cheapest_path.cost
+                paths_from_start.append(cheapest_path)
+                continue
+
             next_paths = generate_paths(cheapest_path, maze)
             for path in next_paths:
-                if path.poses[0] not in seen or path.cost < seen[path.poses[0]].cost:
+                if path.poses[0] not in min_costs or path.cost < min_costs[path.poses[0]]:
+                    min_costs[path.poses[0]] = path.cost
+                if min_costs[path.poses[0]] == path.cost:
                     heapq.heappush(fringe, path)
-                    seen[path.poses[0]] = path
-        return 0
-
-    # @answer(1234)
-    def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        return (
+            paths_from_start[0].cost,
+            len(set(paths_from_start | select(attrgetter("poses")) | chain | select(attrgetter("position")))),
+        )
