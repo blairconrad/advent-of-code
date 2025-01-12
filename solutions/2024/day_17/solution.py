@@ -2,6 +2,8 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/17
 
+from heapq import heapify, heappop, heappush
+
 from ...base import StrSplitSolution, answer
 
 
@@ -73,10 +75,27 @@ class Solution(StrSplitSolution):
         computer.run()
         return ",".join(map(str, computer.output_values))
 
-    # @answer(1234)
-    def part_2(self) -> int:
-        pass
+    @answer(164278764924605)
+    def part_2(self) -> str:
+        register_b: int = int(self.input[1].split(":")[-1].strip())
+        register_c: int = int(self.input[2].split(":")[-1].strip())
+        instructions = list(map(int, self.input[4].split(":")[-1].strip().split(",")))
 
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        fringe = [0, 1, 2, 3, 4, 5, 6, 7]
+        heapify(fringe)
+        while len(fringe) > 0:
+            a = heappop(fringe)
+            target_length = len(oct(a)) - 2
+            if target_length > len(instructions):
+                break
+            expected_output = instructions[len(instructions) - target_length :]
+
+            computer = Computer(instructions, a, register_b, register_c)
+            computer.run()
+
+            if computer.output_values == expected_output:
+                if target_length == len(instructions):
+                    return a
+                for b in range(8):
+                    heappush(fringe, a * 8 + b)
+        return -1
