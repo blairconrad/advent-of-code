@@ -5,20 +5,14 @@
 from ...base import StrSplitSolution, answer
 
 
-class Solution(StrSplitSolution):
-    _year = 2024
-    _day = 17
-
-    def print_state(self) -> None:
-        self.debug((self.register_a, self.register_b, self.register_c))
-        self.debug(self.format_instructions())
-        self.debug(self.output_values)
-
-    def format_instructions(self) -> str:
-        steps = [str(i) for i in self.instructions]
-        if self.next_instruction < len(steps):
-            steps[self.next_instruction] = f"[{steps[self.next_instruction]}]"
-        return " ".join(steps)
+class Computer:
+    def __init__(self, instructions: list[int], register_a: int, register_b: int, register_c: int) -> None:
+        self.instructions = instructions
+        self.register_a = register_a
+        self.register_b = register_b
+        self.register_c = register_c
+        self.next_instruction = 0
+        self.output_values = []
 
     def combo_value(self) -> int:
         literal_value = self.instructions[self.next_instruction + 1]
@@ -37,6 +31,10 @@ class Solution(StrSplitSolution):
 
     def output(self, value: int) -> None:
         self.output_values.append(value)
+
+    def run(self) -> None:
+        while self.next_instruction < len(self.instructions):
+            self.do()
 
     def do(self) -> None:
         match self.instructions[self.next_instruction]:
@@ -59,19 +57,21 @@ class Solution(StrSplitSolution):
                 self.register_c = self.register_a // 2 ** self.combo_value()
         self.next_instruction += 2
 
+
+class Solution(StrSplitSolution):
+    _year = 2024
+    _day = 17
+
     @answer("7,4,2,5,1,4,6,0,4")
     def part_1(self) -> str:
-        self.register_a: int = int(self.input[0].split(":")[-1].strip())
-        self.register_b: int = int(self.input[1].split(":")[-1].strip())
-        self.register_c: int = int(self.input[2].split(":")[-1].strip())
-        self.instructions = list(map(int, self.input[4].split(":")[-1].strip().split(",")))
-        self.next_instruction = 0
-        self.output_values: list[int] = []
-        self.print_state()
-        while self.next_instruction < len(self.instructions):
-            self.do()
-            self.print_state()
-        return ",".join(map(str, self.output_values))
+        register_a: int = int(self.input[0].split(":")[-1].strip())
+        register_b: int = int(self.input[1].split(":")[-1].strip())
+        register_c: int = int(self.input[2].split(":")[-1].strip())
+        instructions = list(map(int, self.input[4].split(":")[-1].strip().split(",")))
+
+        computer = Computer(instructions, register_a, register_b, register_c)
+        computer.run()
+        return ",".join(map(str, computer.output_values))
 
     # @answer(1234)
     def part_2(self) -> int:
