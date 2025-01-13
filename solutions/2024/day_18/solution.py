@@ -63,10 +63,20 @@ class Solution(StrSplitSolution):
 
         return self.find_shortest_path_length(grid_size, falling_bytes)
 
-    # @answer(1234)
-    def part_2(self) -> int:
-        pass
+    @answer("62,6")
+    def part_2(self) -> str:
+        grid_size = (6 if self.use_test_data else 70) + 1
+        all_falling_bytes = list(self.input | split_ints(",") | starmap(Position))
+        self.debug(all_falling_bytes)
 
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        highest_working = 0
+        lowest_failing = len(all_falling_bytes) - 1
+        while highest_working < lowest_failing - 1:
+            try_num_bytes = (lowest_failing + highest_working) // 2
+            self.debug(f"{highest_working, try_num_bytes, lowest_failing}")
+
+            if self.find_shortest_path_length(grid_size, set(all_falling_bytes[:try_num_bytes])) == -1:
+                lowest_failing = try_num_bytes
+            else:
+                highest_working = try_num_bytes
+        return f"{all_falling_bytes[highest_working].row},{all_falling_bytes[highest_working].column}"
