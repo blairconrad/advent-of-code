@@ -82,3 +82,7 @@ class Grid:
 
     def __repr__(self) -> str:
         return "\n".join(self.grid)
+
+
+def manhattan_distance(a: Position, b: Position) -> int:
+    return abs(a.row - b.row) + abs(a.column - b.column)
