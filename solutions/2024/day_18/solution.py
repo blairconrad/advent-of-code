@@ -27,13 +27,7 @@ class Solution(StrSplitSolution):
     _year = 2024
     _day = 18
 
-    @answer(506)
-    def part_1(self) -> int:
-        grid_size = (6 if self.use_test_data else 70) + 1
-        max_number_of_bytes = 12 if self.use_test_data else 1024
-        falling_bytes = set(self.input | split_ints(",") | take(max_number_of_bytes) | starmap(Position))
-        self.debug(falling_bytes)
-
+    def find_shortest_path_length(self, grid_size: int, falling_bytes: set[Position]) -> int:
         start_position = Position(0, 0)
         end_position = Position(grid_size - 1, grid_size - 1)
 
@@ -58,8 +52,16 @@ class Solution(StrSplitSolution):
                 ):
                     seen[next_position] = next_cost
                     heappush(fringe, Path(next_cost, (*current_path.positions, next_position)))
+        return -1
 
-        return 1
+    @answer(506)
+    def part_1(self) -> int:
+        grid_size = (6 if self.use_test_data else 70) + 1
+        max_number_of_bytes = 12 if self.use_test_data else 1024
+        falling_bytes = set(self.input | split_ints(",") | take(max_number_of_bytes) | starmap(Position))
+        self.debug(falling_bytes)
+
+        return self.find_shortest_path_length(grid_size, falling_bytes)
 
     # @answer(1234)
     def part_2(self) -> int:
