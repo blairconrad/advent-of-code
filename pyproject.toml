@@ -24,6 +24,7 @@ target-version = "py313"
 [tool.ruff.lint]
 select = ["ALL"]
 "ignore" = [
+  "B019",     # Use of `functools.lru_cache` or `functools.cache` on methods can lead to memory leaks
   "COM812",   # may cause conflicts when used with the formatter.
   "D",        # Docstrings
   "D203",     # can either force a blank line before docstring or forbid.
