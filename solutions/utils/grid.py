@@ -14,6 +14,9 @@ class Vector:
     def turn_right(self) -> Self:
         return Vector(self.column_change, -self.row_change)
 
+    def __add__(self, other: Self) -> Self:
+        return Vector(self.row_change + other.row_change, self.column_change + other.column_change)
+
     def __mul__(self, scalar: int) -> Self:
         return Vector(self.row_change * scalar, self.column_change * scalar)
 
@@ -79,6 +82,13 @@ class Grid:
 
     def get(self, position: Position, default: str | None) -> str | None:
         return self[position] if self.contains(position) else default
+
+    def find(self, target: str) -> Position:
+        for position, value in self.enumerate():
+            if value == target:
+                return position
+        message = f"{target} not found in grid"
+        raise ValueError(message)
 
     def __repr__(self) -> str:
         return "\n".join(self.grid)
