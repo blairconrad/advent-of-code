@@ -7,7 +7,7 @@ from pipe import where
 from solutions.utils.iterables import how_many
 
 from ...base import StrSplitSolution, answer
-from ...utils.grid import CARDINAL_DIRECTIONS, EAST, NORTH, SOUTH, WEST, Grid, Position
+from ...utils.grid import CARDINAL_DIRECTIONS, Grid, Position, Vector
 
 
 def calculate_all_times_to_end(course: Grid, end: Position) -> dict[Position, int]:
@@ -26,12 +26,19 @@ def calculate_all_times_to_end(course: Grid, end: Position) -> dict[Position, in
     return times
 
 
-def calculate_all_cheat_savings(times: dict[Position, int]) -> dict[tuple[Position, Position], int]:
+def calculate_all_cheat_savings(distance: int, times: dict[Position, int]) -> dict[tuple[Position, Position], int]:
     savings = {}
-    for position, time in times.items():
-        for jump in [NORTH * 2, NORTH + EAST, EAST * 2, EAST + SOUTH, SOUTH * 2, SOUTH + WEST, WEST * 2, WEST + NORTH]:
-            if position + jump in times:
-                savings[(position, position + jump)] = time - times[position + jump] - 2
+    jumps = []
+    for r in range(distance):
+        jumps.append(Vector(r - distance, -r))
+        jumps.append(Vector(r, distance - r))
+        jumps.append(Vector(distance - r, r))
+        jumps.append(Vector(-r, r - distance))
+    for jump in jumps:
+        for position, time in times.items():
+            next_position = position + jump
+            if next_position in times:
+                savings[(position, next_position)] = times[next_position] - time - distance
     return savings
 
 
@@ -43,15 +50,12 @@ class Solution(StrSplitSolution):
     def part_1(self) -> int:
         desired_savings = 100
         course = Grid(self.input)
-        start_position = course.find("S")
         end_position = course.find("E")
-
-        self.debug(start_position, end_position, course)
 
         times = calculate_all_times_to_end(course, end_position)
         self.debug(times)
 
-        savings = calculate_all_cheat_savings(times)
+        savings = calculate_all_cheat_savings(2, times)
         self.debug(savings)
         return how_many(savings.values() | where(lambda x: x >= desired_savings))
 
