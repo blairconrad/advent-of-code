@@ -14,6 +14,9 @@ class Vector:
     def turn_right(self) -> Self:
         return Vector(self.column_change, -self.row_change)
 
+    def turn_around(self) -> Self:
+        return self * -1
+
     def __add__(self, other: Self) -> Self:
         return Vector(self.row_change + other.row_change, self.column_change + other.column_change)
 
