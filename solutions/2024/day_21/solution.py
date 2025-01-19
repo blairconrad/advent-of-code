@@ -2,10 +2,12 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/21
 
-from pipe import chain, select
+from collections.abc import Iterable
+from functools import cache
+
+from pipe import select
 
 from solutions.utils.grid import Grid, Position
-from solutions.utils.iterables import tee
 
 from ...base import StrSplitSolution, answer
 
@@ -56,21 +58,46 @@ def find_all_paths(pad: Grid, keys: str) -> list[str]:
     return paths
 
 
+def segmentize(path: str) -> Iterable[str]:
+    start = 0
+    while start < len(path):
+        a_index = path.find("A", start)
+        yield path[start : a_index + 1]
+        start = a_index + 1
+
+
+def find_shortest_length_for_path(path: str, depth: int) -> int:
+    return sum(segmentize(path) | select(lambda segment: find_shortest_length_for_segment(segment, depth)))
+
+
+@cache
+def find_shortest_length_for_segment(segment: str, depth: int) -> int:
+    if depth == 0:
+        return len(segment)
+
+    expanded_paths = find_all_paths(arrow_pad, segment)
+    return min(expanded_paths | select(lambda path: find_shortest_length_for_path(path, depth - 1)))
+
+
 class Solution(StrSplitSolution):
     _year = 2024
     _day = 21
 
-    @answer(128962)
-    def part_1(self) -> int:
+    def find_min_steps_to_save_human(self, number_of_robots: int) -> int:
         total = 0
         for line in self.input:
             value = int(line[:-1], 10)
-            paths = find_all_paths(number_pad, line) | tee(self.debug)
-            for _ in range(2):
-                paths = paths | select(lambda path: find_all_paths(arrow_pad, path)) | chain | tee(self.debug)
-            total += value * min(paths | select(len))
+            cost = min(
+                find_all_paths(number_pad, line)
+                | select(lambda path: find_shortest_length_for_path(path, number_of_robots))
+            )
+            total += value * cost
         return total
 
-    @answer(1234)
+    @answer(128962)
+    def part_1(self) -> int:
+        return self.find_min_steps_to_save_human(2)
+
+    @answer(159684145150108)
     def part_2(self) -> int:
-        return 1234
+        return self.find_min_steps_to_save_human(25)
