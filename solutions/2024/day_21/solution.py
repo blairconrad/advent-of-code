@@ -65,19 +65,10 @@ class Solution(StrSplitSolution):
         total = 0
         for line in self.input:
             value = int(line[:-1], 10)
-            length = min(
-                find_all_paths(number_pad, line)
-                | tee(self.debug)
-                | select(lambda path: find_all_paths(arrow_pad, path))
-                | chain
-                | tee(self.debug)
-                | select(lambda path: find_all_paths(arrow_pad, path))
-                | chain
-                | tee(self.debug)
-                | select(len)
-            )
-            total += value * length
-
+            paths = find_all_paths(number_pad, line) | tee(self.debug)
+            for _ in range(2):
+                paths = paths | select(lambda path: find_all_paths(arrow_pad, path)) | chain | tee(self.debug)
+            total += value * min(paths | select(len))
         return total
 
     @answer(1234)
