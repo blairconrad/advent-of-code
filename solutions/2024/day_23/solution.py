@@ -15,8 +15,8 @@ from ...base import StrSplitSolution, answer
 pairs = Pipe(itertools.combinations, 2)
 
 
-def might_have_chief(thruple: tuple[str, str, str]) -> bool:
-    return any(thruple | select(lambda n: n.startswith("t")))
+def might_have_chief(cliques: tuple[str, str, str]) -> bool:
+    return any(cliques | select(lambda n: n.startswith("t")))
 
 
 def embiggen_cliques(cliques: list[set[str]], smaller_neighbours: dict[str, set[str]]) -> list[set[str]]:
@@ -33,8 +33,8 @@ class Solution(StrSplitSolution):
     _year = 2024
     _day = 23
 
-    @answer(1218)
-    def part_1(self) -> int:
+    @answer((1218, "ah,ap,ek,fj,fr,jt,ka,ln,me,mp,qa,ql,zg"))
+    def solve(self) -> tuple[int, str]:
         cliques = []
         smaller_neighbours = defaultdict(set)
         self.debug(self.input)
@@ -48,14 +48,11 @@ class Solution(StrSplitSolution):
             cliques.append(set(edge))
         self.debug(smaller_neighbours)
         self.debug(cliques)
-        thruples = embiggen_cliques(cliques, smaller_neighbours)
-        self.debug(thruples)
-        return how_many(thruples | where(might_have_chief))
 
-    # @answer(1234)
-    def part_2(self) -> int:
-        pass
+        cliques = embiggen_cliques(cliques, smaller_neighbours)
+        self.debug(cliques)
+        num_thruples = how_many(cliques | where(might_have_chief))
 
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        while len(cliques) > 1:
+            cliques = embiggen_cliques(cliques, smaller_neighbours)
+        return (num_thruples, ",".join(sorted(cliques[0])))
