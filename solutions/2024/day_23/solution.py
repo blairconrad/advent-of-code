@@ -8,7 +8,7 @@ from functools import partial
 
 from pipe import Pipe, select, where
 
-from solutions.utils.iterables import how_many, tee
+from solutions.utils.iterables import how_many
 
 from ...base import StrSplitSolution, answer
 
@@ -19,23 +19,36 @@ def might_have_chief(thruple: tuple[str, str, str]) -> bool:
     return any(thruple | select(lambda n: n.startswith("t")))
 
 
+def embiggen_cliques(cliques: list[set[str]], smaller_neighbours: dict[str, set[str]]) -> list[set[str]]:
+    bigger_cliques = []
+    while len(cliques) > 0:
+        clique = cliques.pop()
+        for node, neighbours in smaller_neighbours.items():
+            if clique <= neighbours:
+                bigger_cliques.append(clique | {node})
+    return bigger_cliques
+
+
 class Solution(StrSplitSolution):
     _year = 2024
     _day = 23
 
     @answer(1218)
     def part_1(self) -> int:
-        connections = defaultdict(list)
+        cliques = []
+        smaller_neighbours = defaultdict(set)
         self.debug(self.input)
-        links = sorted(self.input | select(partial(str.split, sep="-")) | select(sorted))
-        for start, end in links:
-            connections[start].append(end)
-        self.debug(connections)
-        thruples = []
-        for start, ends in connections.items():
-            for mid, end in ends | pairs | tee(self.debug):
-                if end in connections.get(mid, []):
-                    thruples.append((start, mid, end))
+        edges = self.input | select(partial(str.split, sep="-"))
+        self.debug(edges)
+        for edge in edges:
+            if edge[0] > edge[1]:
+                smaller_neighbours[edge[0]].add(edge[1])
+            else:
+                smaller_neighbours[edge[1]].add(edge[0])
+            cliques.append(set(edge))
+        self.debug(smaller_neighbours)
+        self.debug(cliques)
+        thruples = embiggen_cliques(cliques, smaller_neighbours)
         self.debug(thruples)
         return how_many(thruples | where(might_have_chief))
 
