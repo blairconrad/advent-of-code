@@ -4,17 +4,22 @@
 
 import operator
 import re
-from collections.abc import Callable
 
 from ...base import StrSplitSolution, answer
 
 operators = {"AND": operator.and_, "OR": operator.or_, "XOR": operator.xor}
 
-value_funcs = {"0": lambda: 0, "1": lambda: 1}
+
+class Register:
+    def __init__(self, value: int) -> None:
+        self.value = value
+
+    def __call__(self) -> int:
+        return self.value
 
 
-class Operation:
-    def __init__(self, computer: dict[str, Callable], in_register1: str, operator: str, in_register2: str) -> None:
+class Gate:
+    def __init__(self, computer: "Computer", in_register1: str, operator: str, in_register2: str) -> None:
         self.computer = computer
         self.in_register1 = in_register1
         self.operator = operator
@@ -24,27 +29,37 @@ class Operation:
         return operators[self.operator](self.computer[self.in_register1](), self.computer[self.in_register2]())
 
 
+registers = {"0": Register(0), "1": Register(1)}
+
+Computer = dict[str, Gate | Register]
+
+
+def build_computer(blueprint: list[str]) -> Computer:
+    computer: Computer = {}
+    for line in blueprint:
+        if match := re.match(r"^(?P<register>\S+): (?P<value>[01])$", line):
+            computer[match.group("register")] = registers[match.group("value")]
+        elif match := re.match(
+            r"^(?P<in_register1>\S+) (?P<operator>[A-Z]+) (?P<in_register2>\S+)" " -> " r"(?P<out_register>\S+)$",
+            line,
+        ):
+            computer[match.group("out_register")] = Gate(
+                computer,
+                match.group("in_register1"),
+                match.group("operator"),
+                match.group("in_register2"),
+            )
+
+    return computer
+
+
 class Solution(StrSplitSolution):
     _year = 2024
     _day = 24
 
     @answer(53755311654662)
     def part_1(self) -> int:
-        computer = {}
-        for line in self.input:
-            if match := re.match(r"^(?P<register>\S+): (?P<value>[01])$", line):
-                value = computer[match.group("register")] = value_funcs[match.group("value")]
-            elif match := re.match(
-                r"^(?P<in_register1>\S+) (?P<operator>[A-Z]+) (?P<in_register2>\S+)" " -> " r"(?P<out_register>\S+)$",
-                line,
-            ):
-                self.debug(match.groupdict())
-                computer[match.group("out_register")] = Operation(
-                    computer,
-                    match.group("in_register1"),
-                    match.group("operator"),
-                    match.group("in_register2"),
-                )
+        computer = build_computer(self.input)
         self.debug(computer)
 
         total = 0
