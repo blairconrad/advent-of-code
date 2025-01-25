@@ -30,7 +30,7 @@ def possible_values(terms: tuple[int, ...], operations: Iterable[Callable[[int, 
         yield terms[0]
         return
     for operation in operations:
-        yield from possible_values((operation(terms[0], terms[1]),) + terms[2:], operations)
+        yield from possible_values((operation(terms[0], terms[1]), *terms[2:]), operations)
 
 
 def can_resolve(calibration: Calibration, operations: Iterable[Callable[[int, int], int]]) -> bool:

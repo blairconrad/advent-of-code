@@ -4,18 +4,25 @@
 
 from dataclasses import dataclass
 
+from pipe import select, where
+
+from solutions.utils.iterables import how_many
+
 from ...base import TextSolution, answer
-
-
-@dataclass
-class Key:
-    pins: list[int]
 
 
 @dataclass
 class Lock:
     height: int
     pins: list[int]
+
+
+@dataclass
+class Key:
+    pins: list[int]
+
+    def might_fit(self, lock: Lock) -> bool:
+        return all(self.pins[i] + lock.pins[i] <= lock.height for i in range(5))
 
 
 def parse_input(input_str: str) -> tuple[list[Key], list[Lock]]:
@@ -48,16 +55,7 @@ class Solution(TextSolution):
         self.debug(keys)
         self.debug(locks)
 
-        count = 0
-        for key in keys:
-            for lock in locks:
-                add = 1
-                for i in range(5):
-                    if key.pins[i] + lock.pins[i] > lock.height:
-                        add = 0
-                        break
-                count += add
-        return count
+        return sum(keys | select(lambda key: how_many(locks | where(key.might_fit))))
 
     # @answer(1234)
     def part_2(self) -> int:
