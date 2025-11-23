@@ -3,9 +3,9 @@
 # puzzle prompt: https://adventofcode.com/2024/day/8
 
 from collections import defaultdict
-from collections.abc import Iterable
 from functools import partial
 from itertools import combinations
+from typing import TYPE_CHECKING
 
 from pipe import Pipe, chain, select, skip, take
 
@@ -13,6 +13,9 @@ from solutions.utils.grid import Grid, Position
 from solutions.utils.iterables import tee
 
 from ...base import StrSplitSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def find_antennae(grid: Grid) -> Iterable[list[Position]]:

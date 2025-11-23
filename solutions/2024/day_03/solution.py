@@ -3,13 +3,16 @@
 # puzzle prompt: https://adventofcode.com/2024/day/3
 
 import re
-from collections.abc import Iterable
 from functools import reduce
 from operator import mul
+from typing import TYPE_CHECKING
 
 from pipe import Pipe, chain, select
 
 from ...base import TextSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def to_ints(strs: Iterable[str]) -> Iterable[int]:

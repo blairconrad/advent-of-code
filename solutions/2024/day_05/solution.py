@@ -2,15 +2,17 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/5
 
-from collections.abc import Callable, Iterable
 from functools import cmp_to_key, partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pipe import select, where
 
 from solutions.utils.parsing import split_ints
 
 from ...base import TextSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
 
 type Rule = tuple[int, int]
 type Update = tuple[int, ...]

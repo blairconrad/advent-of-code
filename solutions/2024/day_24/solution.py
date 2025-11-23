@@ -19,7 +19,7 @@ class Register:
 
 
 class Gate:
-    def __init__(self, computer: "Computer", in_register1: str, operator: str, in_register2: str) -> None:
+    def __init__(self, computer: Computer, in_register1: str, operator: str, in_register2: str) -> None:
         self.computer = computer
         self.in_register1 = in_register1
         self.operator = operator

@@ -2,13 +2,17 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/15
 
-from collections.abc import Iterable
+
+from typing import TYPE_CHECKING
 
 from pipe import select, where
 
 from solutions.utils.grid import EAST, NORTH, SOUTH, WEST, Grid, Position, Vector
 
 from ...base import StrSplitSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 directions = {
     "^": NORTH,

@@ -22,7 +22,7 @@ def calculate_yields(secret: int) -> dict[Fingerprint, int]:
         next_secret = calculate_next_secret(secret)
         next_price = next_secret % 10
         difference = next_price - price
-        fingerprint = fingerprint[-(FINGERPRINT_LENGTH - 1) :] + (difference,)
+        fingerprint = (*fingerprint[-(FINGERPRINT_LENGTH - 1) :], difference)
         if len(fingerprint) == FINGERPRINT_LENGTH:
             yields.setdefault(fingerprint, next_price)
         secret = next_secret

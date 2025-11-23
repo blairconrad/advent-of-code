@@ -2,7 +2,8 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/10
 
-from collections.abc import Iterable
+
+from typing import TYPE_CHECKING
 
 from pipe import select, where
 
@@ -10,6 +11,9 @@ from solutions.utils.grid import CARDINAL_DIRECTIONS, Grid, Position
 from solutions.utils.iterables import how_many
 
 from ...base import StrSplitSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def find_neighbours_with_value(park: Grid, start: Position, value: str) -> Iterable[Position]:

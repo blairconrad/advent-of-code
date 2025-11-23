@@ -19,7 +19,7 @@ class Path:
     cost: int
     positions: tuple[Position, ...]
 
-    def __lt__(self, other: "Path") -> bool:
+    def __lt__(self, other: Path) -> bool:
         return self.cost < other.cost
 
 

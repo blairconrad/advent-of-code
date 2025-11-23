@@ -2,12 +2,15 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/11
 
-from collections.abc import Iterable
 from functools import cache
+from typing import TYPE_CHECKING
 
 from pipe import Pipe
 
 from ...base import IntSplitSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def split_int(n: int) -> list[int] | None:

@@ -6,10 +6,10 @@ authors = [
 version = "0.1.0"
 description = "Advent of Code"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
-    "pipe>=2.2",
-    "ruff>=0.8.1",
+    "pipe",
+    "ruff",
 ]
 
 [tool.ruff]
@@ -19,7 +19,7 @@ exclude = [
   "solutions/utils/example.py",
 ]
 line-length = 120
-target-version = "py313"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -27,8 +27,6 @@ select = ["ALL"]
   "B019",     # Use of `functools.lru_cache` or `functools.cache` on methods can lead to memory leaks
   "COM812",   # may cause conflicts when used with the formatter.
   "D",        # Docstrings
-  "D203",     # can either force a blank line before docstring or forbid.
-  "D212",     # can either force a blank line before docstring or forbid.
   "INP001",   # File is part of an implicit namespace package. Add an `__init__.py`.
   "ISC001",   # may cause conflicts when used with the formatter.
   "TID252",   # Prefer absolute imports over relative imports from parent modules

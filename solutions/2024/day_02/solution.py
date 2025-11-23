@@ -3,14 +3,17 @@
 # puzzle prompt: https://adventofcode.com/2024/day/2
 
 
-from collections.abc import Callable
 from itertools import count, islice, pairwise
+from typing import TYPE_CHECKING
 
 from pipe import select, take
 
 from solutions.base import StrSplitSolution, answer
 
 from ...utils.iterables import how_many
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def parse_ints(s: str) -> tuple[int, int, int, int, int]:
@@ -26,7 +29,7 @@ def is_safe_descending(first: int, second: int) -> bool:
 
 
 def nth(n: int) -> int:
-    return lambda iter: next(islice(iter, n, None), None)
+    return lambda it: next(islice(it, n, None), None)
 
 
 def is_safe(level: tuple[int, ...]) -> bool:

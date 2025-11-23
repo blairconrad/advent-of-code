@@ -1,8 +1,8 @@
 # Generated using @xavdid's AoC Python Template: https://github.com/xavdid/advent-of-code-python-template
 
 # puzzle prompt: https://adventofcode.com/2024/day/1
-from collections.abc import Iterable
 from itertools import islice
+from typing import TYPE_CHECKING
 
 from pipe import Pipe, select, sort
 
@@ -10,13 +10,16 @@ from ...base import StrSplitSolution, answer
 from ...utils.iterables import starmap
 from ...utils.parsing import split_ints
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 
 def count(target: int, iterable: Iterable[int]) -> int:
     return sum(1 for i in iterable if i == target)
 
 
 def nth(n: int) -> int:
-    return lambda iter: next(islice(iter, n, None), None)
+    return lambda it: next(islice(it, n, None), None)
 
 
 def abs_diff(a: int, b: int) -> int:

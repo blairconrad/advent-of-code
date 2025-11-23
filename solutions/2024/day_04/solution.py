@@ -2,13 +2,17 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/4
 
-from collections.abc import Iterable
+
+from typing import TYPE_CHECKING
 
 from pipe import Pipe, select, where
 
 from solutions.utils.grid import Grid, Position
 
 from ...base import StrSplitSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def is_block_present_at(puzzle: Grid, starting_position: Position, block: Grid) -> bool:

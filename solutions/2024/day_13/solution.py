@@ -2,9 +2,9 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/13
 
-from collections.abc import Callable
 from dataclasses import dataclass
 from re import DOTALL, findall
+from typing import TYPE_CHECKING
 
 from pipe import select, where
 
@@ -12,6 +12,9 @@ from solutions.utils.iterables import tee
 
 from ...base import TextSolution, answer
 from ...utils.iterables import starmap
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @dataclass

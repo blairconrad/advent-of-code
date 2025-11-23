@@ -2,11 +2,11 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/14
 
-from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import partial, reduce
 from operator import mul
 from re import match
+from typing import TYPE_CHECKING
 
 from pipe import select
 
@@ -14,6 +14,9 @@ from solutions.utils.grid import Position, Vector
 from solutions.utils.iterables import tee
 
 from ...base import StrSplitSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 @dataclass

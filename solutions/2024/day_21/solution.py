@@ -2,14 +2,17 @@
 
 # puzzle prompt: https://adventofcode.com/2024/day/21
 
-from collections.abc import Iterable
 from functools import cache
+from typing import TYPE_CHECKING
 
 from pipe import select
 
 from solutions.utils.grid import Grid, Position
 
 from ...base import StrSplitSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 ACTIVATE = "A"
 number_pad = Grid(["789", "456", "123", " 0A"])
