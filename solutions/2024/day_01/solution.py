@@ -16,7 +16,7 @@ def count(target: int, iterable: Iterable[int]) -> int:
 
 
 def nth(n: int) -> int:
-    return lambda iter: next(islice(iter, n, None), None)
+    return lambda it: next(islice(it, n, None), None)
 
 
 def abs_diff(a: int, b: int) -> int:

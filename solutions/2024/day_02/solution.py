@@ -26,7 +26,7 @@ def is_safe_descending(first: int, second: int) -> bool:
 
 
 def nth(n: int) -> int:
-    return lambda iter: next(islice(iter, n, None), None)
+    return lambda it: next(islice(it, n, None), None)
 
 
 def is_safe(level: tuple[int, ...]) -> bool:
