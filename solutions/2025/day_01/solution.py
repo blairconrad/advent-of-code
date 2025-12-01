@@ -12,9 +12,16 @@ from solutions.utils.iterables import how_many
 from ...base import StrSplitSolution, answer
 
 
-def parse_rotation(rotation_str: str) -> int:
-    magnitude = int(rotation_str[1:])
-    return magnitude if rotation_str[0] == "R" else -magnitude
+class Safe:
+    def __init__(self, size: int, start: int) -> None:
+        self.size = size
+        self.position = start
+
+    def spin(self, rotation: str) -> int:
+        magnitude = int(rotation[1:])
+        move = magnitude if rotation[0] == "R" else -magnitude
+        self.position = (self.position + move) % self.size
+        return self.position
 
 
 class Solution(StrSplitSolution):
@@ -23,7 +30,9 @@ class Solution(StrSplitSolution):
 
     @answer(999)
     def part_1(self) -> int:
-        return how_many(spin(self.input | select(parse_rotation)) | where(lambda x: x == 0))
+        safe = Safe(100, 50)
+
+        return how_many(self.input | select(safe.spin) | where(lambda x: x == 0))
 
     # @answer(3)
     def part_2(self) -> int:
