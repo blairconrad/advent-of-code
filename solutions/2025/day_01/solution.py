@@ -2,14 +2,16 @@
 
 # puzzle prompt: https://adventofcode.com/2025/day/1
 
-from functools import Placeholder, partial
-from itertools import accumulate
+from typing import TYPE_CHECKING
 
-from pipe import select, where
+from pipe import select, traverse, where
 
 from solutions.utils.iterables import how_many
 
 from ...base import StrSplitSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 class Safe:
@@ -18,10 +20,15 @@ class Safe:
         self.position = start
 
     def spin(self, rotation: str) -> int:
-        magnitude = int(rotation[1:])
-        move = magnitude if rotation[0] == "R" else -magnitude
-        self.position = (self.position + move) % self.size
+        list(self.spin_slowly(rotation))
         return self.position
+
+    def spin_slowly(self, rotation: str) -> Generator[int]:
+        magnitude = int(rotation[1:])
+        step = 1 if rotation[0] == "R" else -1
+        for _ in range(magnitude):
+            self.position = (self.position + step) % self.size
+            yield self.position
 
 
 class Solution(StrSplitSolution):
@@ -31,13 +38,9 @@ class Solution(StrSplitSolution):
     @answer(999)
     def part_1(self) -> int:
         safe = Safe(100, 50)
-
         return how_many(self.input | select(safe.spin) | where(lambda x: x == 0))
 
-    # @answer(3)
+    @answer(6099)
     def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        safe = Safe(100, 50)
+        return how_many(self.input | select(safe.spin_slowly) | traverse | where(lambda x: x == 0))
