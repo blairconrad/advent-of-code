@@ -32,10 +32,6 @@ class Solution(StrSplitSolution):
     def part_1(self) -> int:
         return sum(self.input | select(partial(get_max_joltage, 2)))
 
-    # @answer(1234)
+    @answer(167523425665348)
     def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        return sum(self.input | select(partial(get_max_joltage, 12)))
