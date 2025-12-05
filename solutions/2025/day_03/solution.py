@@ -2,20 +2,26 @@
 
 # puzzle prompt: https://adventofcode.com/2025/day/3
 
+from functools import partial
+
 from pipe import select
 
 from ...base import StrSplitSolution, answer
 
 
-def get_max_joltage(bank: str) -> int:
-    j1 = "0"
-    j1_index = -1
-    for index1 in range(len(bank) - 1):
-        if bank[index1] > j1:
-            j1 = bank[index1]
-            j1_index = index1
-    j2 = max(bank[j1_index + 1 :])
-    return 10 * int(j1) + int(j2)
+def get_max_joltage(num_batteries: int, bank: str) -> int:
+    if num_batteries == 1:
+        return int(max(bank))
+
+    j = "0"
+    j_index = -1
+    for index in range(len(bank) - num_batteries + 1):
+        if bank[index] > j:
+            j = bank[index]
+            j_index = index
+    return 10 ** (num_batteries - 1) * int(j) + get_max_joltage(
+        num_batteries=num_batteries - 1, bank=bank[j_index + 1 :]
+    )
 
 
 class Solution(StrSplitSolution):
@@ -24,7 +30,7 @@ class Solution(StrSplitSolution):
 
     @answer(16842)
     def part_1(self) -> int:
-        return sum(self.input | select(get_max_joltage))
+        return sum(self.input | select(partial(get_max_joltage, 2)))
 
     # @answer(1234)
     def part_2(self) -> int:
