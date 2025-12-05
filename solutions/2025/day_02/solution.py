@@ -39,10 +39,6 @@ class Solution(StrSplitSolution):
             self.input | select(parse_range) | traverse | where(lambda s: repeated_chunk_count(s) == EXACTLY_TWO_CHUNKS)
         )
 
-    # @answer(1234)
+    @answer(58961152806)
     def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        return sum(self.input | select(parse_range) | traverse | where(lambda s: repeated_chunk_count(s) > 1))
