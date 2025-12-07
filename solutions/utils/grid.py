@@ -62,7 +62,7 @@ class Pose:
 
 class Grid:
     def __init__(self, grid: list[str]) -> None:
-        self.grid = grid
+        self.grid = grid[:]
 
     def __getitem__(self, key: Position) -> str:
         return self.grid[key.row][key.column]
