@@ -3,10 +3,11 @@
 # puzzle prompt: https://adventofcode.com/2025/day/4
 
 from functools import partial
+from itertools import repeat
 from operator import itemgetter
 from typing import TYPE_CHECKING
 
-from pipe import select, where
+from pipe import select, take_while, where
 
 from solutions.utils.grid import CARDINAL_DIRECTIONS, EAST, NORTH, SOUTH, WEST, Grid, Position
 from solutions.utils.iterables import how_many
@@ -42,19 +43,24 @@ def find_movable_rolls(warehouse: Grid) -> Iterable[Position]:
     )
 
 
+def move_roll(warehouse: Grid, roll: Position) -> None:
+    warehouse[roll] = "x"
+
+
+def move_rolls(warehouse: Grid) -> int:
+    return how_many(list(find_movable_rolls(warehouse)) | select(partial(move_roll, warehouse)))
+
+
 class Solution(StrSplitSolution):
     _year = 2025
     _day = 4
 
     @answer(1508)
     def part_1(self) -> int:
-        warehouse = Grid(self.input)
-        return how_many(find_movable_rolls(warehouse))
+        warehouse = Grid(self.input[:])
+        return move_rolls(warehouse)
 
-    # @answer(1234)
+    @answer(8538)
     def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        warehouse = Grid(self.input)
+        return sum(repeat(warehouse) | select(move_rolls) | take_while(lambda moved: moved > 0))
