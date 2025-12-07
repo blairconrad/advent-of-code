@@ -4,6 +4,7 @@
 
 from functools import partial
 from operator import itemgetter
+from typing import TYPE_CHECKING
 
 from pipe import select, where
 
@@ -11,6 +12,9 @@ from solutions.utils.grid import CARDINAL_DIRECTIONS, EAST, NORTH, SOUTH, WEST, 
 from solutions.utils.iterables import how_many
 
 from ...base import StrSplitSolution, answer
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 POSITION = 0
 CONTENT = 1
@@ -22,9 +26,19 @@ TOO_MANY_ADJACENT_ROLLS = 4
 PRINCIPAL_DIRECTIONS = (*CARDINAL_DIRECTIONS, NORTH + EAST, EAST + SOUTH, SOUTH + WEST, WEST + NORTH)
 
 
-def count_adjacent_rolls(grid: Grid, position: Position) -> int:
-    return how_many(
-        direction for direction in PRINCIPAL_DIRECTIONS if grid.get(position + direction, None) == PAPER_ROLL
+def can_move_roll(grid: Grid, position: Position) -> bool:
+    return (
+        how_many(direction for direction in PRINCIPAL_DIRECTIONS if grid.get(position + direction, None) == PAPER_ROLL)
+        < TOO_MANY_ADJACENT_ROLLS
+    )
+
+
+def find_movable_rolls(warehouse: Grid) -> Iterable[Position]:
+    return (
+        warehouse.enumerate()
+        | where(lambda tile: tile[CONTENT] == PAPER_ROLL)
+        | select(itemgetter(POSITION))
+        | where(partial(can_move_roll, warehouse))
     )
 
 
@@ -35,13 +49,7 @@ class Solution(StrSplitSolution):
     @answer(1508)
     def part_1(self) -> int:
         warehouse = Grid(self.input)
-        return how_many(
-            warehouse.enumerate()
-            | where(lambda tile: tile[CONTENT] == PAPER_ROLL)
-            | select(itemgetter(POSITION))
-            | select(partial(count_adjacent_rolls, warehouse))
-            | where(lambda count: count < TOO_MANY_ADJACENT_ROLLS)
-        )
+        return how_many(find_movable_rolls(warehouse))
 
     # @answer(1234)
     def part_2(self) -> int:
