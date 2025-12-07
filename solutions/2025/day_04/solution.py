@@ -57,7 +57,7 @@ class Solution(StrSplitSolution):
 
     @answer(1508)
     def part_1(self) -> int:
-        warehouse = Grid(self.input[:])
+        warehouse = Grid(self.input)
         return move_rolls(warehouse)
 
     @answer(8538)
