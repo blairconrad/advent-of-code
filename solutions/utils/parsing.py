@@ -1,6 +1,10 @@
-from collections.abc import Iterable
+
+from typing import TYPE_CHECKING
 
 from pipe import Pipe, select
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 @Pipe
