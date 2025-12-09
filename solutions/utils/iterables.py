@@ -1,7 +1,9 @@
-from collections.abc import Callable, Iterable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pipe import Pipe
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
 
 
 def how_many(iterable: Iterable[Any]) -> int:
