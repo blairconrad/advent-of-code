@@ -10,19 +10,19 @@ class Vector:
     row_change: int
     column_change: int
 
-    def turn_left(self) -> Self:
+    def turn_left(self) -> Vector:
         return Vector(-self.column_change, self.row_change)
 
-    def turn_right(self) -> Self:
+    def turn_right(self) -> Vector:
         return Vector(self.column_change, -self.row_change)
 
-    def turn_around(self) -> Self:
+    def turn_around(self) -> Vector:
         return self * -1
 
-    def __add__(self, other: Self) -> Self:
+    def __add__(self, other: Self) -> Vector:
         return Vector(self.row_change + other.row_change, self.column_change + other.column_change)
 
-    def __mul__(self, scalar: int) -> Self:
+    def __mul__(self, scalar: int) -> Vector:
         return Vector(self.row_change * scalar, self.column_change * scalar)
 
 
@@ -39,7 +39,7 @@ class Position:
     row: int
     column: int
 
-    def __add__(self, pos: Vector) -> Self:
+    def __add__(self, pos: Vector) -> Position:
         return Position(self.row + pos.row_change, self.column + pos.column_change)
 
     @overload
