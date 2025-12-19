@@ -63,14 +63,14 @@ class Pose:
 
 
 class Grid:
-    def __init__(self, grid: list[str]) -> None:
-        self.grid = grid[:]
+    def __init__(self, grid: Iterable[Iterable[str]]) -> None:
+        self.grid = [list(row) for row in grid]
 
     def __getitem__(self, key: Position) -> str:
         return self.grid[key.row][key.column]
 
     def __setitem__(self, key: Position, value: str) -> None:
-        self.grid[key.row] = self.grid[key.row][: key.column] + value + self.grid[key.row][key.column + 1 :]
+        self.grid[key.row][key.column] = value
 
     def enumerate(self) -> Iterable[tuple[Position, str]]:
         return (
@@ -96,7 +96,7 @@ class Grid:
         raise ValueError(message)
 
     def __repr__(self) -> str:
-        return "\n".join(self.grid)
+        return "\n".join(["".join(row) for row in self.grid])
 
 
 def manhattan_distance(a: Position, b: Position) -> int:
