@@ -2,43 +2,48 @@
 
 # puzzle prompt: https://adventofcode.com/2025/day/7
 
-from functools import Placeholder, partial
-from itertools import accumulate
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
 
-from pipe import Pipe, select
+from pipe import select, where
+
+from solutions.utils.grid import EAST, NORTH, WEST, Grid
+from solutions.utils.iterables import how_many
 
 from ...base import StrSplitSolution, answer
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Generator, Iterable
+    from collections.abc import Iterable
 
-SPLIT: str = "*"
-BEAM: str = "S"
-A_SPLIT_BEAM = BEAM + SPLIT + BEAM
+EMPTY: int = 0
+BEAM: int = 1
+SPLITTER: int = -1
+HIT_SPLITTER = -2
 
-count_splits = partial(str.count, Placeholder, SPLIT)
-
-
-def advance(this_line: str, next_line: str) -> str:
-    new_next_line = next_line
-    for i in range(len(this_line)):
-        if this_line[i] == BEAM:
-            if next_line[i] == "^":
-                new_next_line = new_next_line[: i - 1] + A_SPLIT_BEAM + new_next_line[i + 2 :]
-            else:
-                new_next_line = new_next_line[:i] + BEAM + new_next_line[i + 1 :]
-    return new_next_line
+point_mapping: dict[str, int] = {
+    ".": EMPTY,
+    "S": BEAM,
+    "^": SPLITTER,
+}
 
 
-T = TypeVar("T")
+def parse_point(point: str) -> int:
+    return point_mapping.get(point, EMPTY)
 
 
-@Pipe
-def tee(iterable: Iterable[T], printer: Callable[[T], None]) -> Generator[T]:
-    for item in iterable:
-        printer(item)
-        yield item
+def parse_line(line: str) -> Iterable[int]:
+    return line | select(parse_point)
+
+
+def fire_beam(field: Grid[int]) -> None:
+    for position in field.positions():
+        match field[position]:
+            case value if value == SPLITTER:
+                if field[position + NORTH] == BEAM:
+                    field[position] = HIT_SPLITTER
+                    field[position + WEST] = BEAM
+                    field[position + EAST] = BEAM
+            case _ if field[position + NORTH] == BEAM:
+                field[position] = BEAM
 
 
 class Solution(StrSplitSolution):
@@ -47,7 +52,10 @@ class Solution(StrSplitSolution):
 
     @answer(1518)
     def part_1(self) -> int:
-        return sum(accumulate(self.input, advance) | tee(self.debug) | select(count_splits))
+        field = Grid(self.input | select(parse_line))
+        fire_beam(field)
+
+        return how_many(field.enumerate() | select(lambda pv: pv[1]) | where(lambda v: v == HIT_SPLITTER))
 
     # @answer(1234)
     def part_2(self) -> int:
