@@ -15,15 +15,19 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
 EMPTY: int = 0
-BEAM: int = 1
+INITIAL_BEAM: int = 1
 SPLITTER: int = -1
 HIT_SPLITTER = -2
 
 point_mapping: dict[str, int] = {
     ".": EMPTY,
-    "S": BEAM,
+    "S": INITIAL_BEAM,
     "^": SPLITTER,
 }
+
+
+def is_beam(value: int) -> bool:
+    return value >= INITIAL_BEAM
 
 
 def parse_point(point: str) -> int:
@@ -38,29 +42,26 @@ def fire_beam(field: Grid[int]) -> None:
     for position in field.positions():
         match field[position]:
             case value if value == SPLITTER:
-                if field[position + NORTH] == BEAM:
+                if is_beam(beam_paths := field[position + NORTH]):
                     field[position] = HIT_SPLITTER
-                    field[position + WEST] = BEAM
-                    field[position + EAST] = BEAM
-            case _ if field[position + NORTH] == BEAM:
-                field[position] = BEAM
+                    field[position + WEST] += beam_paths
+                    field[position + EAST] = beam_paths
+            case value if value >= 0:
+                if is_beam(beam_paths := field[position + NORTH]):
+                    field[position] += field[position + NORTH]
 
 
 class Solution(StrSplitSolution):
     _year = 2025
     _day = 7
 
-    @answer(1518)
-    def part_1(self) -> int:
+    @answer((1518, 4567))
+    def solve(self) -> tuple[int, int]:
         field = Grid(self.input | select(parse_line))
         fire_beam(field)
+        last_row = field.grid[-1]
 
-        return how_many(field.enumerate() | select(lambda pv: pv[1]) | where(lambda v: v == HIT_SPLITTER))
-
-    # @answer(1234)
-    def part_2(self) -> int:
-        pass
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        return (
+            how_many(field.enumerate() | select(lambda pv: pv[1]) | where(lambda v: v == HIT_SPLITTER)),
+            sum(last_row),
+        )
