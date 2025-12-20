@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self, overload
+from typing import TYPE_CHECKING, Self, TypeVar, overload
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -62,17 +62,20 @@ class Pose:
     direction: Vector
 
 
-class Grid:
-    def __init__(self, grid: Iterable[Iterable[str]]) -> None:
+T = TypeVar("T")
+
+
+class Grid[T]:
+    def __init__(self, grid: Iterable[Iterable[T]]) -> None:
         self.grid = [list(row) for row in grid]
 
-    def __getitem__(self, key: Position) -> str:
+    def __getitem__(self, key: Position) -> T:
         return self.grid[key.row][key.column]
 
-    def __setitem__(self, key: Position, value: str) -> None:
+    def __setitem__(self, key: Position, value: T) -> None:
         self.grid[key.row][key.column] = value
 
-    def enumerate(self) -> Iterable[tuple[Position, str]]:
+    def enumerate(self) -> Iterable[tuple[Position, T]]:
         return (
             (Position(row, column), self.grid[row][column])
             for row in range(len(self.grid))
@@ -85,10 +88,10 @@ class Grid:
     def contains(self, position: Position) -> bool:
         return 0 <= position.row < len(self.grid) and 0 <= position.column < len(self.grid[position.row])
 
-    def get(self, position: Position, default: str | None) -> str | None:
+    def get(self, position: Position, default: T | None) -> T | None:
         return self[position] if self.contains(position) else default
 
-    def find(self, target: str) -> Position:
+    def find(self, target: T) -> Position:
         for position, value in self.enumerate():
             if value == target:
                 return position
@@ -96,7 +99,7 @@ class Grid:
         raise ValueError(message)
 
     def __repr__(self) -> str:
-        return "\n".join(["".join(row) for row in self.grid])
+        return "\n".join(["".join(map(str, row)) for row in self.grid])
 
 
 def manhattan_distance(a: Position, b: Position) -> int:
