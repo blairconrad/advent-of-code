@@ -69,10 +69,18 @@ class Solution(StrSplitSolution):
 
         return 0
 
-    @answer(117000)
+    @answer(8368033065)
     def part_2(self) -> int:
-        pass
+        points = read_points(self.input)
+        circuits: dict[Point, tuple[Point, ...]] = {point: (point,) for point in points}
+        segments = list(
+            combinations(points, 2) | select(lambda pair: Segment(euclidean_distance(pair[0], pair[1]), *pair))
+        )
+        heapq.heapify(segments)
 
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
+        while True:
+            segment = heapq.heappop(segments)
+            merge_circuits(circuits, segment.point1, segment.point2)
+            if len(circuits[segment.point1]) == len(points):
+                break
+        return segment.point1[0] * segment.point2[0]
